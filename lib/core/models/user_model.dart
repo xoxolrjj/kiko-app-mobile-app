@@ -20,6 +20,7 @@ class UserModel with _$UserModel {
     String? photoUrl,
     required UserRole role,
     bool? isVerified,
+    @Default(false) bool isRestricted,
     required DateTime createdAt,
   }) = _UserModel;
 
@@ -37,6 +38,7 @@ class UserModel with _$UserModel {
       photoUrl: null,
       role: UserRole.user,
       isVerified: false,
+      isRestricted: false,
       password: '',
       createdAt: DateTime.now(),
     );
@@ -63,6 +65,7 @@ class UserModel with _$UserModel {
           UserRole.values.byName(cast<String>(json['role']) ?? '') ??
           UserRole.user,
       isVerified: cast<bool>(json['isVerified']) ?? false,
+      isRestricted: cast<bool>(json['isRestricted']) ?? false,
       createdAt:
           (cast<Timestamp>(json['createdAt']) ?? Timestamp.now()).toDate(),
     );
@@ -83,6 +86,7 @@ class UserModel with _$UserModel {
           UserRole.values.byName(cast<String>(json['role']) ?? '') ??
           UserRole.user,
       isVerified: cast<bool>(json['isVerified']) ?? false,
+      isRestricted: cast<bool>(json['isRestricted']) ?? false,
       createdAt:
           (cast<Timestamp>(json['createdAt']) ?? Timestamp.now()).toDate(),
     );
@@ -101,6 +105,7 @@ class UserModel with _$UserModel {
       'photoUrl': photoUrl,
       'role': role.name,
       'isVerified': isVerified,
+      'isRestricted': isRestricted,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }

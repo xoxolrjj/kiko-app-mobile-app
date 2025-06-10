@@ -6,6 +6,8 @@ import 'package:kiko_app_mobile_app/core/models/product_model.dart';
 import 'package:kiko_app_mobile_app/core/models/order_model.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
 import 'package:provider/provider.dart';
+import 'package:kiko_app_mobile_app/core/stores/notification_store.dart';
+import 'package:kiko_app_mobile_app/core/models/notification_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final ProductModel product;
@@ -83,6 +85,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'id': orderRef.id,
         'buyerId': user.uid,
         'buyerName': authStore.currentUser!.name,
+        'buyerPhone': _phoneController.text.trim(),
+        'deliveryAddress': _addressController.text.trim(),
         'sellerId': widget.product.sellerId,
         'sellerName':
             widget.sellerData['businessName'] ??
@@ -93,10 +97,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'quantity': widget.quantity,
         'totalAmount': widget.quantity * widget.product.pricePerSack,
         'status': 'pending',
+        'notes': _notesController.text.trim(),
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       };
       await orderRef.set(orderData);
+
+      // Send notification to buyer
+      final notificationStore = NotificationStore();
+      await notificationStore.createNotification(
+        userId: user.uid,
+        title: 'Order Placed',
+        message:
+            'Your order for ${widget.quantity} sacks of ${widget.product.name} has been placed successfully.',
+        type: NotificationType.orderPlaced,
+        orderId: orderRef.id,
+      );
+
+      // Send notification to seller
+      await notificationStore.createNotification(
+        userId: widget.product.sellerId,
+        title: 'New Order Received',
+        message:
+            'You have received a new order for ${widget.quantity} sacks of ${widget.product.name}.',
+        type: NotificationType.newOrder,
+        orderId: orderRef.id,
+      );
 
       // Check for existing conversation with this seller
       final existingConversationQuery =

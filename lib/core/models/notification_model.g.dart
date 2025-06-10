@@ -10,22 +10,35 @@ _$NotificationModelImpl _$$NotificationModelImplFromJson(
   Map<String, dynamic> json,
 ) => _$NotificationModelImpl(
   id: json['id'] as String,
+  userId: json['userId'] as String,
   title: json['title'] as String,
   message: json['message'] as String,
-  type: json['type'] as String,
-  isRead: json['isRead'] as bool,
+  type: $enumDecode(_$NotificationTypeEnumMap, json['type']),
   createdAt: DateTime.parse(json['createdAt'] as String),
-  updatedAt: DateTime.parse(json['updatedAt'] as String),
+  isRead: json['isRead'] as bool,
+  orderId: json['orderId'] as String?,
+  sellerId: json['sellerId'] as String?,
 );
 
 Map<String, dynamic> _$$NotificationModelImplToJson(
   _$NotificationModelImpl instance,
 ) => <String, dynamic>{
   'id': instance.id,
+  'userId': instance.userId,
   'title': instance.title,
   'message': instance.message,
-  'type': instance.type,
-  'isRead': instance.isRead,
+  'type': _$NotificationTypeEnumMap[instance.type]!,
   'createdAt': instance.createdAt.toIso8601String(),
-  'updatedAt': instance.updatedAt.toIso8601String(),
+  'isRead': instance.isRead,
+  'orderId': instance.orderId,
+  'sellerId': instance.sellerId,
+};
+
+const _$NotificationTypeEnumMap = {
+  NotificationType.sellerApproval: 'sellerApproval',
+  NotificationType.orderPlaced: 'orderPlaced',
+  NotificationType.orderShipped: 'orderShipped',
+  NotificationType.orderDelivered: 'orderDelivered',
+  NotificationType.accountRestricted: 'accountRestricted',
+  NotificationType.newOrder: 'newOrder',
 };

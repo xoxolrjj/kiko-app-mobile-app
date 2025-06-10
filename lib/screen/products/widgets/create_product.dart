@@ -6,6 +6,7 @@ import 'package:kiko_app_mobile_app/core/models/product_model.dart';
 import 'package:kiko_app_mobile_app/core/stores/product_store.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
+import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
 
 class CreateProduct extends StatefulWidget {
   final ProductModel? productToEdit;
@@ -69,79 +70,86 @@ class _CreateProductState extends State<CreateProduct> {
   }
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      if (_selectedImage == null && _existingImageUrl == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Please add an image')));
-        return;
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authStore = Provider.of<AuthStore>(context, listen: false);
+      final user = authStore.currentUser;
+
+      if (user == null) {
+        throw Exception('User not logged in');
       }
 
-      setState(() => _isLoading = true);
-
-      try {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user == null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Please login first')));
-          return;
-        }
-
-        final productStore = Provider.of<ProductStore>(context, listen: false);
-
-        if (isEditing) {
-          // Update existing product
-          final updatedProduct = widget.productToEdit!.copyWith(
-            name: _nameController.text.trim(),
-            description: _descriptionController.text.trim(),
-            pricePerSack: double.parse(_pricePerSackController.text.trim()),
-            stock: int.parse(_stockController.text.trim()),
-            category: _selectedCategory,
-            imagePath: _selectedImage ?? _existingImageUrl!,
-          );
-
-          await productStore.updateProduct(updatedProduct);
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Product updated successfully')),
-            );
-            context.go('/seller/products');
-          }
-        } else {
-          // Create new product
-          await productStore.createProduct(
-            name: _nameController.text.trim(),
-            description: _descriptionController.text.trim(),
-            pricePerSack: double.parse(_pricePerSackController.text.trim()),
-            stock: int.parse(_stockController.text.trim()),
-            category: _selectedCategory,
-            imagePath: _selectedImage!,
-            sellerId: user.uid,
-          );
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Product created successfully')),
-            );
-            context.go('/seller/products');
-          }
-        }
-      } catch (e) {
+      // Check if seller is restricted
+      if (user.isRestricted) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text(
-                'Error ${isEditing ? "updating" : "creating"} product: $e',
+                'Your account has been restricted from uploading products. Please contact support.',
               ),
+              backgroundColor: Colors.red,
             ),
           );
         }
-      } finally {
+        return;
+      }
+
+      final productStore = Provider.of<ProductStore>(context, listen: false);
+
+      if (isEditing && widget.productToEdit != null) {
+        // Update existing product
+        final updatedProduct = widget.productToEdit!.copyWith(
+          name: _nameController.text.trim(),
+          description: _descriptionController.text.trim(),
+          pricePerSack: double.parse(_pricePerSackController.text.trim()),
+          stock: int.parse(_stockController.text.trim()),
+          category: _selectedCategory,
+          imagePath: _selectedImage ?? widget.productToEdit!.imagePath,
+        );
+
+        await productStore.updateProduct(updatedProduct);
+
         if (mounted) {
-          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product updated successfully')),
+          );
+          context.go('/seller/products');
         }
+      } else {
+        // Create new product
+        await productStore.createProduct(
+          name: _nameController.text.trim(),
+          description: _descriptionController.text.trim(),
+          pricePerSack: double.parse(_pricePerSackController.text.trim()),
+          stock: int.parse(_stockController.text.trim()),
+          category: _selectedCategory,
+          imagePath: _selectedImage!,
+          sellerId: user.id,
+        );
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product created successfully')),
+          );
+          context.go('/seller/products');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error ${isEditing ? "updating" : "creating"} product: $e',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }

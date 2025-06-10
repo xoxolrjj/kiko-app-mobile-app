@@ -28,6 +28,7 @@ mixin _$UserModel {
   String? get photoUrl => throw _privateConstructorUsedError;
   UserRole get role => throw _privateConstructorUsedError;
   bool? get isVerified => throw _privateConstructorUsedError;
+  bool get isRestricted => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Create a copy of UserModel
@@ -54,6 +55,7 @@ abstract class $UserModelCopyWith<$Res> {
     String? photoUrl,
     UserRole role,
     bool? isVerified,
+    bool isRestricted,
     DateTime createdAt,
   });
 }
@@ -84,6 +86,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? photoUrl = freezed,
     Object? role = null,
     Object? isVerified = freezed,
+    Object? isRestricted = null,
     Object? createdAt = null,
   }) {
     return _then(
@@ -143,6 +146,11 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                     ? _value.isVerified
                     : isVerified // ignore: cast_nullable_to_non_nullable
                         as bool?,
+            isRestricted:
+                null == isRestricted
+                    ? _value.isRestricted
+                    : isRestricted // ignore: cast_nullable_to_non_nullable
+                        as bool,
             createdAt:
                 null == createdAt
                     ? _value.createdAt
@@ -175,6 +183,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
     String? photoUrl,
     UserRole role,
     bool? isVerified,
+    bool isRestricted,
     DateTime createdAt,
   });
 }
@@ -204,6 +213,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? photoUrl = freezed,
     Object? role = null,
     Object? isVerified = freezed,
+    Object? isRestricted = null,
     Object? createdAt = null,
   }) {
     return _then(
@@ -263,6 +273,11 @@ class __$$UserModelImplCopyWithImpl<$Res>
                 ? _value.isVerified
                 : isVerified // ignore: cast_nullable_to_non_nullable
                     as bool?,
+        isRestricted:
+            null == isRestricted
+                ? _value.isRestricted
+                : isRestricted // ignore: cast_nullable_to_non_nullable
+                    as bool,
         createdAt:
             null == createdAt
                 ? _value.createdAt
@@ -288,6 +303,7 @@ class _$UserModelImpl extends _UserModel {
     this.photoUrl,
     required this.role,
     this.isVerified,
+    this.isRestricted = false,
     required this.createdAt,
   }) : super._();
 
@@ -314,11 +330,14 @@ class _$UserModelImpl extends _UserModel {
   @override
   final bool? isVerified;
   @override
+  @JsonKey()
+  final bool isRestricted;
+  @override
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, name: $name, location: $location, password: $password, phoneNumber: $phoneNumber, gender: $gender, age: $age, photoUrl: $photoUrl, role: $role, isVerified: $isVerified, createdAt: $createdAt)';
+    return 'UserModel(id: $id, email: $email, name: $name, location: $location, password: $password, phoneNumber: $phoneNumber, gender: $gender, age: $age, photoUrl: $photoUrl, role: $role, isVerified: $isVerified, isRestricted: $isRestricted, createdAt: $createdAt)';
   }
 
   @override
@@ -342,6 +361,8 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.role, role) || other.role == role) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
+            (identical(other.isRestricted, isRestricted) ||
+                other.isRestricted == isRestricted) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -360,6 +381,7 @@ class _$UserModelImpl extends _UserModel {
     photoUrl,
     role,
     isVerified,
+    isRestricted,
     createdAt,
   );
 
@@ -385,6 +407,7 @@ abstract class _UserModel extends UserModel {
     final String? photoUrl,
     required final UserRole role,
     final bool? isVerified,
+    final bool isRestricted,
     required final DateTime createdAt,
   }) = _$UserModelImpl;
   _UserModel._() : super._();
@@ -411,6 +434,8 @@ abstract class _UserModel extends UserModel {
   UserRole get role;
   @override
   bool? get isVerified;
+  @override
+  bool get isRestricted;
   @override
   DateTime get createdAt;
 

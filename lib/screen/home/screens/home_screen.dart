@@ -45,6 +45,24 @@ class _HomeScreenState extends State<HomeScreen> {
               context.go('/become-a-seller');
             },
           ),
+          IconButton(
+            icon: Badge(
+              label: StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance
+                        .collection('notifications')
+                        .where('userId', isEqualTo: authStore.currentUser?.id)
+                        .where('isRead', isEqualTo: false)
+                        .snapshots(),
+                builder: (context, snapshot) {
+                  final count = snapshot.data?.docs.length ?? 0;
+                  return Text(count.toString());
+                },
+              ),
+              child: const Icon(Icons.notifications),
+            ),
+            onPressed: () => context.go('/notifications'),
+          ),
         ],
       ),
       body: SafeArea(

@@ -5,7 +5,15 @@ import 'package:kiko_app_mobile_app/core/commons/utils.dart';
 part 'order_model.freezed.dart';
 part 'order_model.g.dart';
 
-enum OrderStatus { pending, accepted, preparing, ready, completed, cancelled }
+enum OrderStatus {
+  pending,
+  accepted,
+  preparing,
+  ready,
+  shipped,
+  delivered,
+  cancelled,
+}
 
 @freezed
 class OrderModel with _$OrderModel {
@@ -24,7 +32,8 @@ class OrderModel with _$OrderModel {
     required DateTime updatedAt,
     DateTime? acceptedAt,
     DateTime? readyAt,
-    DateTime? completedAt,
+    DateTime? shippedAt,
+    DateTime? deliveredAt,
     String? notes,
     String? rejectionReason,
   }) = _OrderModel;
@@ -84,9 +93,11 @@ class OrderModel with _$OrderModel {
       acceptedAt:
           data['acceptedAt'] != null ? parseDateTime(data['acceptedAt']) : null,
       readyAt: data['readyAt'] != null ? parseDateTime(data['readyAt']) : null,
-      completedAt:
-          data['completedAt'] != null
-              ? parseDateTime(data['completedAt'])
+      shippedAt:
+          data['shippedAt'] != null ? parseDateTime(data['shippedAt']) : null,
+      deliveredAt:
+          data['deliveredAt'] != null
+              ? parseDateTime(data['deliveredAt'])
               : null,
       notes: cast<String>(data['notes']),
       rejectionReason: cast<String>(data['rejectionReason']),

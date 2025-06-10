@@ -41,15 +41,9 @@ class UserManagementScreen extends StatelessWidget {
               return _UserCard(
                 user: user,
                 onRestrict:
-                    () => _updateUserStatus(
-                      context,
-                      users[index].id,
-                      'restricted',
-                    ),
+                    () => _updateUserStatus(context, users[index].id, true),
                 onUnrestrict:
-                    () => _updateUserStatus(context, users[index].id, 'active'),
-                onBan:
-                    () => _updateUserStatus(context, users[index].id, 'banned'),
+                    () => _updateUserStatus(context, users[index].id, false),
               );
             },
           );
@@ -61,24 +55,34 @@ class UserManagementScreen extends StatelessWidget {
   Future<void> _updateUserStatus(
     BuildContext context,
     String userId,
-    String status,
+    bool isRestricted,
   ) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(userId).update({
-        'status': status,
+        'isRestricted': isRestricted,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('User $status successfully')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isRestricted
+                  ? 'User has been restricted from uploading products'
+                  : 'User restriction has been removed',
+            ),
+            backgroundColor: isRestricted ? Colors.red : Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error updating user: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating user status: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -88,21 +92,15 @@ class _UserCard extends StatelessWidget {
   final UserModel user;
   final VoidCallback onRestrict;
   final VoidCallback onUnrestrict;
-  final VoidCallback onBan;
 
   const _UserCard({
     required this.user,
     required this.onRestrict,
     required this.onUnrestrict,
-    required this.onBan,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Get user status from the user data (add default status if not present)
-    final String userStatus =
-        'active'; // Default status since it's not in the user model yet
-
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -114,7 +112,10 @@ class _UserCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(user.name, style: Theme.of(context).textTheme.titleLarge),
-                _StatusChip(status: userStatus),
+                _StatusChip(
+                  isRestricted: user.isRestricted,
+                  isSeller: user.role == UserRole.seller,
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -126,31 +127,30 @@ class _UserCard extends StatelessWidget {
               value: user.location.isNotEmpty ? user.location : 'Not provided',
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (userStatus == 'active')
-                  TextButton(
-                    onPressed: onRestrict,
-                    child: const Text('Restrict'),
-                  )
-                else if (userStatus == 'restricted')
-                  TextButton(
-                    onPressed: onUnrestrict,
-                    child: const Text('Unrestrict'),
-                  ),
-                if (userStatus != 'banned') ...[
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: onBan,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+            if (user.role == UserRole.seller)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (user.isRestricted)
+                    ElevatedButton(
+                      onPressed: onUnrestrict,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Remove Restriction'),
+                    )
+                  else
+                    ElevatedButton(
+                      onPressed: onRestrict,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Restrict'),
                     ),
-                    child: const Text('Ban'),
-                  ),
                 ],
-              ],
-            ),
+              ),
           ],
         ),
       ),
@@ -159,33 +159,21 @@ class _UserCard extends StatelessWidget {
 }
 
 class _StatusChip extends StatelessWidget {
-  final String status;
+  final bool isRestricted;
+  final bool isSeller;
 
-  const _StatusChip({required this.status});
+  const _StatusChip({required this.isRestricted, required this.isSeller});
 
   @override
   Widget build(BuildContext context) {
-    Color color;
-    switch (status) {
-      case 'active':
-        color = Colors.green;
-        break;
-      case 'restricted':
-        color = Colors.orange;
-        break;
-      case 'banned':
-        color = Colors.red;
-        break;
-      default:
-        color = Colors.grey;
-    }
+    if (!isSeller) return const SizedBox.shrink();
 
     return Chip(
       label: Text(
-        status.toUpperCase(),
-        style: const TextStyle(color: Colors.white, fontSize: 12),
+        isRestricted ? 'Restricted' : 'Active',
+        style: TextStyle(color: isRestricted ? Colors.white : Colors.black),
       ),
-      backgroundColor: color,
+      backgroundColor: isRestricted ? Colors.red : Colors.green,
     );
   }
 }
@@ -207,7 +195,10 @@ class _InfoRow extends StatelessWidget {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
           ),
           Expanded(child: Text(value)),

@@ -21,7 +21,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
 
     final authStore = Provider.of<AuthStore>(context, listen: false);
     userId = authStore.currentUser?.id;
@@ -64,7 +64,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
             Tab(text: 'Accepted'),
             Tab(text: 'Preparing'),
             Tab(text: 'Ready'),
-            Tab(text: 'Completed'),
+            Tab(text: 'Shipped'),
+            Tab(text: 'Delivered'),
+            Tab(text: 'Cancelled'),
           ],
         ),
       ),
@@ -76,7 +78,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
           _buildOrdersList(OrderStatus.accepted),
           _buildOrdersList(OrderStatus.preparing),
           _buildOrdersList(OrderStatus.ready),
-          _buildOrdersList(OrderStatus.completed),
+          _buildOrdersList(OrderStatus.shipped),
+          _buildOrdersList(OrderStatus.delivered),
+          _buildOrdersList(OrderStatus.cancelled),
         ],
       ),
     );
@@ -170,8 +174,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
         return 'No orders being prepared';
       case OrderStatus.ready:
         return 'No orders ready for pickup';
-      case OrderStatus.completed:
-        return 'No completed orders';
+      case OrderStatus.shipped:
+        return 'No shipped orders';
+      case OrderStatus.delivered:
+        return 'No delivered orders';
       case OrderStatus.cancelled:
         return 'No cancelled orders';
     }
@@ -351,8 +357,10 @@ class _OrderCard extends StatelessWidget {
           _buildTimelineStep('Order Accepted', order.acceptedAt!, true),
         if (order.readyAt != null)
           _buildTimelineStep('Order Ready', order.readyAt!, true),
-        if (order.completedAt != null)
-          _buildTimelineStep('Order Completed', order.completedAt!, true),
+        if (order.shippedAt != null)
+          _buildTimelineStep('Order Shipped', order.shippedAt!, true),
+        if (order.deliveredAt != null)
+          _buildTimelineStep('Order Delivered', order.deliveredAt!, true),
       ],
     );
   }
@@ -402,7 +410,9 @@ class _OrderCard extends StatelessWidget {
         return Colors.purple;
       case OrderStatus.ready:
         return Colors.green;
-      case OrderStatus.completed:
+      case OrderStatus.shipped:
+        return Colors.indigo;
+      case OrderStatus.delivered:
         return Colors.teal;
       case OrderStatus.cancelled:
         return Colors.red;
@@ -419,7 +429,9 @@ class _OrderCard extends StatelessWidget {
         return Icons.kitchen;
       case OrderStatus.ready:
         return Icons.done;
-      case OrderStatus.completed:
+      case OrderStatus.shipped:
+        return Icons.local_shipping;
+      case OrderStatus.delivered:
         return Icons.done_all;
       case OrderStatus.cancelled:
         return Icons.cancel;

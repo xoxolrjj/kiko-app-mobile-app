@@ -35,7 +35,8 @@ mixin _$OrderModel {
   DateTime get updatedAt => throw _privateConstructorUsedError;
   DateTime? get acceptedAt => throw _privateConstructorUsedError;
   DateTime? get readyAt => throw _privateConstructorUsedError;
-  DateTime? get completedAt => throw _privateConstructorUsedError;
+  DateTime? get shippedAt => throw _privateConstructorUsedError;
+  DateTime? get deliveredAt => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   String? get rejectionReason => throw _privateConstructorUsedError;
 
@@ -71,7 +72,8 @@ abstract class $OrderModelCopyWith<$Res> {
     DateTime updatedAt,
     DateTime? acceptedAt,
     DateTime? readyAt,
-    DateTime? completedAt,
+    DateTime? shippedAt,
+    DateTime? deliveredAt,
     String? notes,
     String? rejectionReason,
   });
@@ -106,7 +108,8 @@ class _$OrderModelCopyWithImpl<$Res, $Val extends OrderModel>
     Object? updatedAt = null,
     Object? acceptedAt = freezed,
     Object? readyAt = freezed,
-    Object? completedAt = freezed,
+    Object? shippedAt = freezed,
+    Object? deliveredAt = freezed,
     Object? notes = freezed,
     Object? rejectionReason = freezed,
   }) {
@@ -182,10 +185,15 @@ class _$OrderModelCopyWithImpl<$Res, $Val extends OrderModel>
                     ? _value.readyAt
                     : readyAt // ignore: cast_nullable_to_non_nullable
                         as DateTime?,
-            completedAt:
-                freezed == completedAt
-                    ? _value.completedAt
-                    : completedAt // ignore: cast_nullable_to_non_nullable
+            shippedAt:
+                freezed == shippedAt
+                    ? _value.shippedAt
+                    : shippedAt // ignore: cast_nullable_to_non_nullable
+                        as DateTime?,
+            deliveredAt:
+                freezed == deliveredAt
+                    ? _value.deliveredAt
+                    : deliveredAt // ignore: cast_nullable_to_non_nullable
                         as DateTime?,
             notes:
                 freezed == notes
@@ -227,7 +235,8 @@ abstract class _$$OrderModelImplCopyWith<$Res>
     DateTime updatedAt,
     DateTime? acceptedAt,
     DateTime? readyAt,
-    DateTime? completedAt,
+    DateTime? shippedAt,
+    DateTime? deliveredAt,
     String? notes,
     String? rejectionReason,
   });
@@ -261,7 +270,8 @@ class __$$OrderModelImplCopyWithImpl<$Res>
     Object? updatedAt = null,
     Object? acceptedAt = freezed,
     Object? readyAt = freezed,
-    Object? completedAt = freezed,
+    Object? shippedAt = freezed,
+    Object? deliveredAt = freezed,
     Object? notes = freezed,
     Object? rejectionReason = freezed,
   }) {
@@ -337,10 +347,15 @@ class __$$OrderModelImplCopyWithImpl<$Res>
                 ? _value.readyAt
                 : readyAt // ignore: cast_nullable_to_non_nullable
                     as DateTime?,
-        completedAt:
-            freezed == completedAt
-                ? _value.completedAt
-                : completedAt // ignore: cast_nullable_to_non_nullable
+        shippedAt:
+            freezed == shippedAt
+                ? _value.shippedAt
+                : shippedAt // ignore: cast_nullable_to_non_nullable
+                    as DateTime?,
+        deliveredAt:
+            freezed == deliveredAt
+                ? _value.deliveredAt
+                : deliveredAt // ignore: cast_nullable_to_non_nullable
                     as DateTime?,
         notes:
             freezed == notes
@@ -375,7 +390,8 @@ class _$OrderModelImpl implements _OrderModel {
     required this.updatedAt,
     this.acceptedAt,
     this.readyAt,
-    this.completedAt,
+    this.shippedAt,
+    this.deliveredAt,
     this.notes,
     this.rejectionReason,
   }) : _items = items;
@@ -418,7 +434,9 @@ class _$OrderModelImpl implements _OrderModel {
   @override
   final DateTime? readyAt;
   @override
-  final DateTime? completedAt;
+  final DateTime? shippedAt;
+  @override
+  final DateTime? deliveredAt;
   @override
   final String? notes;
   @override
@@ -426,7 +444,7 @@ class _$OrderModelImpl implements _OrderModel {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, buyerId: $buyerId, buyerName: $buyerName, buyerPhone: $buyerPhone, sellerId: $sellerId, sellerName: $sellerName, items: $items, totalAmount: $totalAmount, deliveryAddress: $deliveryAddress, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, acceptedAt: $acceptedAt, readyAt: $readyAt, completedAt: $completedAt, notes: $notes, rejectionReason: $rejectionReason)';
+    return 'OrderModel(id: $id, buyerId: $buyerId, buyerName: $buyerName, buyerPhone: $buyerPhone, sellerId: $sellerId, sellerName: $sellerName, items: $items, totalAmount: $totalAmount, deliveryAddress: $deliveryAddress, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, acceptedAt: $acceptedAt, readyAt: $readyAt, shippedAt: $shippedAt, deliveredAt: $deliveredAt, notes: $notes, rejectionReason: $rejectionReason)';
   }
 
   @override
@@ -457,8 +475,10 @@ class _$OrderModelImpl implements _OrderModel {
             (identical(other.acceptedAt, acceptedAt) ||
                 other.acceptedAt == acceptedAt) &&
             (identical(other.readyAt, readyAt) || other.readyAt == readyAt) &&
-            (identical(other.completedAt, completedAt) ||
-                other.completedAt == completedAt) &&
+            (identical(other.shippedAt, shippedAt) ||
+                other.shippedAt == shippedAt) &&
+            (identical(other.deliveredAt, deliveredAt) ||
+                other.deliveredAt == deliveredAt) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.rejectionReason, rejectionReason) ||
                 other.rejectionReason == rejectionReason));
@@ -482,7 +502,8 @@ class _$OrderModelImpl implements _OrderModel {
     updatedAt,
     acceptedAt,
     readyAt,
-    completedAt,
+    shippedAt,
+    deliveredAt,
     notes,
     rejectionReason,
   );
@@ -517,7 +538,8 @@ abstract class _OrderModel implements OrderModel {
     required final DateTime updatedAt,
     final DateTime? acceptedAt,
     final DateTime? readyAt,
-    final DateTime? completedAt,
+    final DateTime? shippedAt,
+    final DateTime? deliveredAt,
     final String? notes,
     final String? rejectionReason,
   }) = _$OrderModelImpl;
@@ -554,7 +576,9 @@ abstract class _OrderModel implements OrderModel {
   @override
   DateTime? get readyAt;
   @override
-  DateTime? get completedAt;
+  DateTime? get shippedAt;
+  @override
+  DateTime? get deliveredAt;
   @override
   String? get notes;
   @override

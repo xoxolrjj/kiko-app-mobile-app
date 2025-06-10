@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kiko_app_mobile_app/core/models/seller_verification_request_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:kiko_app_mobile_app/core/stores/notification_store.dart';
+import 'package:kiko_app_mobile_app/core/models/notification_model.dart';
 
 class SellerRequestsScreen extends StatelessWidget {
   const SellerRequestsScreen({super.key});
@@ -231,6 +233,26 @@ class SellerRequestsScreen extends StatelessWidget {
             'role': 'seller',
             'updatedAt': FieldValue.serverTimestamp(),
           });
+
+          // Send notification to user
+          final notificationStore = NotificationStore();
+          await notificationStore.createNotification(
+            userId: requestData['userId'],
+            title: 'Seller Application Approved',
+            message:
+                'Congratulations! Your seller application has been approved. You can now start selling on our platform.',
+            type: NotificationType.sellerApproval,
+          );
+        } else {
+          // Send notification to user
+          final notificationStore = NotificationStore();
+          await notificationStore.createNotification(
+            userId: requestData['userId'],
+            title: 'Seller Application Rejected',
+            message:
+                'We regret to inform you that your seller application has been rejected. Please contact support for more information.',
+            type: NotificationType.sellerApproval,
+          );
         }
       });
 

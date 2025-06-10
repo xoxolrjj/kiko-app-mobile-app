@@ -31,10 +31,14 @@ _$OrderModelImpl _$$OrderModelImplFromJson(Map<String, dynamic> json) =>
           json['readyAt'] == null
               ? null
               : DateTime.parse(json['readyAt'] as String),
-      completedAt:
-          json['completedAt'] == null
+      shippedAt:
+          json['shippedAt'] == null
               ? null
-              : DateTime.parse(json['completedAt'] as String),
+              : DateTime.parse(json['shippedAt'] as String),
+      deliveredAt:
+          json['deliveredAt'] == null
+              ? null
+              : DateTime.parse(json['deliveredAt'] as String),
       notes: json['notes'] as String?,
       rejectionReason: json['rejectionReason'] as String?,
     );
@@ -55,7 +59,8 @@ Map<String, dynamic> _$$OrderModelImplToJson(_$OrderModelImpl instance) =>
       'updatedAt': instance.updatedAt.toIso8601String(),
       'acceptedAt': instance.acceptedAt?.toIso8601String(),
       'readyAt': instance.readyAt?.toIso8601String(),
-      'completedAt': instance.completedAt?.toIso8601String(),
+      'shippedAt': instance.shippedAt?.toIso8601String(),
+      'deliveredAt': instance.deliveredAt?.toIso8601String(),
       'notes': instance.notes,
       'rejectionReason': instance.rejectionReason,
     };
@@ -65,7 +70,8 @@ const _$OrderStatusEnumMap = {
   OrderStatus.accepted: 'accepted',
   OrderStatus.preparing: 'preparing',
   OrderStatus.ready: 'ready',
-  OrderStatus.completed: 'completed',
+  OrderStatus.shipped: 'shipped',
+  OrderStatus.delivered: 'delivered',
   OrderStatus.cancelled: 'cancelled',
 };
 

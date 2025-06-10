@@ -28,6 +28,9 @@ import 'package:kiko_app_mobile_app/screen/messaging/screens/conversation_detail
 import 'package:kiko_app_mobile_app/screen/seller/screens/seller_message_screen.dart';
 import 'package:kiko_app_mobile_app/core/models/user_model.dart';
 import 'package:kiko_app_mobile_app/screen/admin/screens/banner_management_screen.dart';
+import 'package:kiko_app_mobile_app/screen/notifications/screens/notifications_screen.dart'
+    as user_notifications;
+import 'package:kiko_app_mobile_app/core/stores/notification_store.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -102,6 +105,11 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/become-a-seller',
       builder: (context, state) => const BecomeASeller(),
+    ),
+    GoRoute(
+      path: '/notifications',
+      builder:
+          (context, state) => const user_notifications.NotificationsScreen(),
     ),
 
     GoRoute(
@@ -286,4 +294,82 @@ void _onItemTapped(int index, BuildContext context) {
       GoRouter.of(context).go('/profile');
       break;
   }
+}
+
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final bool showBackButton;
+  final List<Widget>? actions;
+
+  const _AppBar({
+    required this.title,
+    this.showBackButton = true,
+    this.actions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final authStore = Provider.of<AuthStore>(context);
+    final user = authStore.currentUser;
+    final notificationStore = NotificationStore();
+
+    return AppBar(
+      title: Text(title),
+      leading:
+          showBackButton
+              ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.go('/'),
+              )
+              : null,
+      actions: [
+        if (user != null) ...[
+          StreamBuilder<int>(
+            stream: Stream.periodic(
+              const Duration(seconds: 30),
+            ).asyncMap((_) => notificationStore.getUnreadCount(user.id)),
+            builder: (context, snapshot) {
+              final unreadCount = snapshot.data ?? 0;
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications),
+                    onPressed: () => context.go('/notifications'),
+                  ),
+                  if (unreadCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          unreadCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          if (actions != null) ...actions!,
+        ],
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

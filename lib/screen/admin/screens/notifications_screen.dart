@@ -18,43 +18,37 @@ class NotificationsScreen extends StatelessWidget {
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('notifications')
-            .where('type', whereIn: ['admin', 'system'])
-            .orderBy('createdAt', descending: true)
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection('notifications')
+                .where('type', whereIn: ['admin', 'system'])
+                .orderBy('createdAt', descending: true)
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           final notifications = snapshot.data?.docs ?? [];
 
           if (notifications.isEmpty) {
-            return const Center(
-              child: Text('No notifications'),
-            );
+            return const Center(child: Text('No notifications'));
           }
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: notifications.length,
             itemBuilder: (context, index) {
-              final notification = notifications[index].data() as Map<String, dynamic>;
+              final notification =
+                  notifications[index].data() as Map<String, dynamic>;
               return _NotificationCard(
                 notification: NotificationModel.fromJson(notification),
-                onMarkAsRead: () => _markAsRead(
-                  context,
-                  notifications[index].id,
-                ),
+                onMarkAsRead:
+                    () => _markAsRead(context, notifications[index].id),
               );
             },
           );
@@ -68,16 +62,11 @@ class NotificationsScreen extends StatelessWidget {
       await FirebaseFirestore.instance
           .collection('notifications')
           .doc(notificationId)
-          .update({
-        'isRead': true,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+          .update({'isRead': true, 'updatedAt': FieldValue.serverTimestamp()});
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error marking notification as read: $e'),
-          ),
+          SnackBar(content: Text('Error marking notification as read: $e')),
         );
       }
     }
@@ -86,11 +75,12 @@ class NotificationsScreen extends StatelessWidget {
   Future<void> _markAllAsRead(BuildContext context) async {
     try {
       final batch = FirebaseFirestore.instance.batch();
-      final notifications = await FirebaseFirestore.instance
-          .collection('notifications')
-          .where('type', whereIn: ['admin', 'system'])
-          .where('isRead', isEqualTo: false)
-          .get();
+      final notifications =
+          await FirebaseFirestore.instance
+              .collection('notifications')
+              .where('type', whereIn: ['admin', 'system'])
+              .where('isRead', isEqualTo: false)
+              .get();
 
       for (var doc in notifications.docs) {
         batch.update(doc.reference, {
@@ -103,9 +93,7 @@ class NotificationsScreen extends StatelessWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('All notifications marked as read'),
-          ),
+          const SnackBar(content: Text('All notifications marked as read')),
         );
       }
     } catch (e) {
@@ -143,16 +131,16 @@ class _NotificationCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    _getNotificationIcon(notification.type),
-                    color: _getNotificationColor(notification.type),
+                    _getNotificationIcon(notification.type.name),
+                    color: _getNotificationColor(notification.type.name),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       notification.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   if (!notification.isRead)
@@ -174,9 +162,9 @@ class _NotificationCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 _formatDate(notification.createdAt),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.grey),
               ),
             ],
           ),
@@ -221,4 +209,4 @@ class _NotificationCard extends StatelessWidget {
       return 'Just now';
     }
   }
-} 
+}
