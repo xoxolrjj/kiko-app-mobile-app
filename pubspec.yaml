@@ -1,0 +1,58 @@
+name: kiko_app_mobile_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  go_router: ^13.0.0 
+  # Firebase
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
+  cloud_firestore: ^5.6.6
+  firebase_storage: ^12.4.6
+
+   
+  # State Management
+  mobx: ^2.3.0
+  flutter_mobx: ^2.2.0
+  provider: ^6.1.1
+  
+  # Code Generation
+  freezed_annotation: ^2.4.1
+  
+  device_info_plus: ^9.1.2
+  firebase_messaging: ^15.2.5
+  permission_handler: ^11.0.1
+  get_it: ^8.0.3
+
+  # UI
+  cached_network_image: ^3.3.0
+  image_picker: ^1.0.7
+  flutter_secure_storage: ^9.0.0
+  font_awesome_flutter: ^10.8.0
+  local_auth: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+ 
+  # Code Generation
+  build_runner: ^2.4.8
+  mobx_codegen: ^2.6.0
+  freezed: ^2.4.5
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+
+
+  assets:
+    - assets/images/

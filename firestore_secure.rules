@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Admin collection - allow read for authentication
+    match /admins/{adminId} {
+      allow read: if true; // Allow reading for admin authentication
+      allow write: if false; // Prevent modifications through client
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, update: if isAdmin(); // Admins can read and update all users
+    }
+    
+    // Seller verification requests
+    match /seller_verification_requests/{requestId} {
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, update: if isAdmin(); // Only admins can read and approve/reject
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId; // Users can read their own requests
+    }
+    
+    // Sellers collection
+    match /sellers/{sellerId} {
+      allow read: if true; // Public read for marketplace
+      allow write: if isAdmin(); // Only admins can create seller profiles
+      allow update: if request.auth != null && 
+        (request.auth.uid == sellerId || isAdmin()); // Sellers can update their own profiles, admins can update any
+    }
+    
+    // Products collection
+    match /products/{productId} {
+      allow read: if true; // Public read for marketplace
+      allow create, update, delete: if request.auth != null && 
+        (request.auth.uid == resource.data.sellerId || isSellerOwner(resource.data.sellerId) || isAdmin());
+    }
+    
+    // Orders/Deliveries collection
+    match /deliveries/{deliveryId} {
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.buyerId || 
+         request.auth.uid == resource.data.sellerId || 
+         isAdmin());
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+        (request.auth.uid == resource.data.sellerId || isAdmin());
+    }
+    
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if isAdmin(); // Admins can create notifications
+      allow read: if isAdmin(); // Admins can read all notifications
+    }
+    
+    // Helper functions
+    function isAdmin() {
+      // Check if the authenticated user has an admin document
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isActive == true;
+    }
+    
+    function isSellerOwner(sellerId) {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/sellers/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/sellers/$(request.auth.uid)).data.userId == request.auth.uid;
+    }
+    
+    function getUserRole() {
+      return request.auth != null &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    // Legacy seller_requests collection (if still used)
+    match /seller_requests/{requestId} {
+      allow read, write: if isAdmin();
+      allow create: if request.auth != null;
+    }
+  }
+} 
