@@ -5,7 +5,7 @@ import 'package:kiko_app_mobile_app/core/models/user_model.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
 import 'package:provider/provider.dart';
 
- import 'login_screen.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -224,10 +224,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return 'Please enter a password';
                   }
                   if (value.length < 8) {
-                    return 'Password must be at least 8 characters long';
+                    return 'Password must be at least 8 characters';
                   }
-                  if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$').hasMatch(value)) {
-                    return 'Password must contain at least one letter, one number, and one special character';
+                  if (!RegExp(
+                    r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$',
+                  ).hasMatch(value)) {
+                    return 'Password must include a letter, number, and special character';
                   }
                   return null;
                 },

@@ -15,6 +15,7 @@ enum PhilippineIDType {
   postalId,
   barangayId,
   nationalID,
+  farmerID,
 }
 
 enum VerificationStatus { pending, approved, rejected }
@@ -272,6 +273,8 @@ class SellerVerificationRequest {
         return 'Barangay ID';
       case PhilippineIDType.nationalID:
         return 'National ID';
+      case PhilippineIDType.farmerID:
+        return 'Farmer ID';
     }
   }
 }

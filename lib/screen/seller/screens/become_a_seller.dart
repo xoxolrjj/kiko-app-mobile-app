@@ -1030,6 +1030,8 @@ class _BecomeASellerState extends State<BecomeASeller> {
         return 'Barangay ID';
       case PhilippineIDType.nationalID:
         return 'National ID';
+      case PhilippineIDType.farmerID:
+        return 'Farmer ID';
     }
   }
 

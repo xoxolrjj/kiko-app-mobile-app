@@ -121,8 +121,6 @@ abstract class _AuthStore with Store {
       errorMessage = 'Failed to get user data';
       debugPrint('Error getting user data: $e');
       currentUser = null;
-    } finally {
-      isLoading = false;
     }
   }
 
