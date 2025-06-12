@@ -8,12 +8,7 @@ import 'package:kiko_app_mobile_app/core/stores/product_store.dart';
 import 'package:kiko_app_mobile_app/core/stores/seller_store.dart';
 import 'package:provider/provider.dart';
 import 'dependency/dependency_manager.dart';
-
-// Repositories
-
-// Stores
  
-// Screens
 
 void main() async {
   try {

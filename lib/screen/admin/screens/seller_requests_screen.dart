@@ -217,7 +217,6 @@ class SellerRequestsScreen extends StatelessWidget {
             'idType': requestData['idType'],
             'idNumber': requestData['idNumber'],
             'verificationStatus': 'verified',
-            'biometricVerified': requestData['biometricVerified'] ?? false,
             'totalOrders': 0,
             'totalProducts': 0,
             'profilePhotoUrl': requestData['faceVerificationUrl'],
@@ -348,13 +347,6 @@ class _SellerVerificationCard extends StatelessWidget {
                 _buildImageSection('ID Document', request.idImageUrl),
                 const SizedBox(height: 16),
                 _buildSectionTitle('Face Verification'),
-                const SizedBox(height: 8),
-                _InfoRow(
-                  label: 'Biometric Verified',
-                  value: request.biometricVerified ? 'Yes' : 'No',
-                  valueColor:
-                      request.biometricVerified ? Colors.green : Colors.red,
-                ),
                 const SizedBox(height: 8),
                 _buildImageSection('Face Photo', request.faceVerificationUrl),
                 if (request.rejectionReason != null) ...[

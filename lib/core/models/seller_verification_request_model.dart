@@ -28,7 +28,6 @@ class SellerVerificationRequest {
   final String userPhone;
 
   // Business Information
-
   final String shopName;
   final String contactNumber;
   final String shopLocation;
@@ -38,10 +37,8 @@ class SellerVerificationRequest {
   final String idNumber;
   final String idImageUrl;
 
-  // Biometric Verification
+  // Face Verification
   final String faceVerificationUrl;
-  final bool biometricVerified;
-  final String biometricData; // Encrypted biometric hash
 
   // Status and Timestamps
   final VerificationStatus status;
@@ -64,8 +61,6 @@ class SellerVerificationRequest {
     required this.idNumber,
     required this.idImageUrl,
     required this.faceVerificationUrl,
-    required this.biometricVerified,
-    required this.biometricData,
     required this.status,
     this.rejectionReason,
     required this.createdAt,
@@ -81,7 +76,6 @@ class SellerVerificationRequest {
       userName: '',
       userEmail: '',
       userPhone: '',
-
       shopName: '',
       contactNumber: '',
       shopLocation: '',
@@ -89,8 +83,6 @@ class SellerVerificationRequest {
       idNumber: '',
       idImageUrl: '',
       faceVerificationUrl: '',
-      biometricVerified: false,
-      biometricData: '',
       status: VerificationStatus.pending,
       rejectionReason: null,
       createdAt: DateTime.now(),
@@ -122,8 +114,6 @@ class SellerVerificationRequest {
       idNumber: cast<String>(data['idNumber']) ?? '',
       idImageUrl: cast<String>(data['idImageUrl']) ?? '',
       faceVerificationUrl: cast<String>(data['faceVerificationUrl']) ?? '',
-      biometricVerified: cast<bool>(data['biometricVerified']) ?? false,
-      biometricData: cast<String>(data['biometricData']) ?? '',
       status: VerificationStatus.values.firstWhere(
         (e) => e.name == cast<String>(data['status']),
         orElse: () => VerificationStatus.pending,
@@ -155,8 +145,6 @@ class SellerVerificationRequest {
       idNumber: cast<String>(data['idNumber']) ?? '',
       idImageUrl: cast<String>(data['idImageUrl']) ?? '',
       faceVerificationUrl: cast<String>(data['faceVerificationUrl']) ?? '',
-      biometricVerified: cast<bool>(data['biometricVerified']) ?? false,
-      biometricData: cast<String>(data['biometricData']) ?? '',
       status: VerificationStatus.values.firstWhere(
         (e) => e.name == cast<String>(data['status']),
         orElse: () => VerificationStatus.pending,
@@ -185,8 +173,6 @@ class SellerVerificationRequest {
       'idNumber': idNumber,
       'idImageUrl': idImageUrl,
       'faceVerificationUrl': faceVerificationUrl,
-      'biometricVerified': biometricVerified,
-      'biometricData': biometricData,
       'status': status.name,
       'rejectionReason': rejectionReason,
       'createdAt': Timestamp.fromDate(createdAt),
@@ -202,17 +188,13 @@ class SellerVerificationRequest {
     String? userName,
     String? userEmail,
     String? userPhone,
-
     String? shopName,
     String? contactNumber,
     String? shopLocation,
-
     PhilippineIDType? idType,
     String? idNumber,
     String? idImageUrl,
     String? faceVerificationUrl,
-    bool? biometricVerified,
-    String? biometricData,
     VerificationStatus? status,
     String? rejectionReason,
     DateTime? createdAt,
@@ -226,7 +208,6 @@ class SellerVerificationRequest {
       userName: userName ?? this.userName,
       userEmail: userEmail ?? this.userEmail,
       userPhone: userPhone ?? this.userPhone,
-
       shopName: shopName ?? this.shopName,
       contactNumber: contactNumber ?? this.contactNumber,
       shopLocation: shopLocation ?? this.shopLocation,
@@ -234,8 +215,6 @@ class SellerVerificationRequest {
       idNumber: idNumber ?? this.idNumber,
       idImageUrl: idImageUrl ?? this.idImageUrl,
       faceVerificationUrl: faceVerificationUrl ?? this.faceVerificationUrl,
-      biometricVerified: biometricVerified ?? this.biometricVerified,
-      biometricData: biometricData ?? this.biometricData,
       status: status ?? this.status,
       rejectionReason: rejectionReason ?? this.rejectionReason,
       createdAt: createdAt ?? this.createdAt,

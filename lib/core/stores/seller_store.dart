@@ -6,10 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:kiko_app_mobile_app/core/models/seller_model.dart';
 import 'package:kiko_app_mobile_app/core/models/seller_verification_request_model.dart';
 import 'package:kiko_app_mobile_app/core/models/user_model.dart';
+import 'package:kiko_app_mobile_app/core/stores/notification_store.dart';
+import 'package:kiko_app_mobile_app/core/models/notification_model.dart';
 import 'package:mobx/mobx.dart';
 import 'package:kiko_app_mobile_app/dependency/dependency_manager.dart';
 
@@ -21,7 +22,6 @@ abstract class _SellerStore with Store {
   final FirebaseFirestore _firestore = sl<FirebaseFirestore>();
   final FirebaseAuth _auth = sl<FirebaseAuth>();
   final FirebaseStorage _storage = sl<FirebaseStorage>();
-  final LocalAuthentication _localAuth = LocalAuthentication();
 
   @observable
   bool isLoading = false;
@@ -31,105 +31,6 @@ abstract class _SellerStore with Store {
 
   @observable
   int sellerCount = 0;
-
-  // Commented out for now - biometric verification
-  // @observable
-  // bool biometricCheckAvailable = false;
-
-  // Temporary property for when biometric verification is disabled
-  @observable
-  bool biometricCheckAvailable = true; // Always true when biometric is disabled
-
-  // @observable
-  // bool biometricAuthenticated = false;
-
-  // Temporary property for when biometric verification is disabled
-  @observable
-  bool biometricAuthenticated = false;
-
-  // @observable
-  // List<BiometricType> availableBiometrics = [];
-
-  // Temporary property for when biometric verification is disabled
-  @observable
-  List<BiometricType> availableBiometrics = [];
-
-  // @action
-  // Future<void> initializeBiometrics() async {
-  //   try {
-  //     // Check if device supports biometrics
-  //     biometricCheckAvailable = await _localAuth.canCheckBiometrics;
-  //
-  //     if (biometricCheckAvailable) {
-  //       availableBiometrics = await _localAuth.getAvailableBiometrics();
-  //     }
-  //   } catch (e) {
-  //     debugPrint('Error initializing biometrics: $e');
-  //     errorMessage = 'Failed to initialize biometric authentication';
-  //   }
-  // }
-
-  // @action
-  // Future<bool> authenticateWithBiometrics() async {
-  //   try {
-  //     if (!biometricCheckAvailable) {
-  //       errorMessage = 'Biometric authentication not available on this device';
-  //       return false;
-  //     }
-
-  //     final isAuthenticated = await _localAuth.authenticate(
-  //       localizedReason: 'Verify your identity for seller account registration',
-  //       options: const AuthenticationOptions(
-  //         biometricOnly: true,
-  //         stickyAuth: true,
-  //       ),
-  //     );
-
-  //     biometricAuthenticated = isAuthenticated;
-  //
-  //     if (!isAuthenticated) {
-  //       errorMessage = 'Biometric authentication failed';
-  //     }
-  //
-  //     return isAuthenticated;
-  //   } catch (e) {
-  //     debugPrint('Error during biometric authentication: $e');
-  //     errorMessage = 'Biometric authentication error: $e';
-  //     return false;
-  //   }
-  // }
-
-  // Temporary method for when biometric verification is disabled
-  @action
-  Future<void> initializeBiometrics() async {
-    // Do nothing - biometric verification is disabled
-    biometricCheckAvailable = true;
-  }
-
-  // Temporary method for when biometric verification is disabled
-  @action
-  Future<bool> authenticateWithBiometrics() async {
-    // Always return true when biometric verification is disabled
-    biometricAuthenticated = true;
-    return true;
-  }
-
-  @action
-  Future<void> loadSellerCount() async {
-    try {
-      final querySnapshot =
-          await _firestore
-              .collection('users')
-              .where('role', isEqualTo: UserRole.seller.name)
-              .get();
-
-      sellerCount = querySnapshot.docs.length;
-      debugPrint('Loaded seller count: $sellerCount');
-    } catch (e) {
-      debugPrint('Error loading seller count: $e');
-      errorMessage = 'Failed to load seller count';
-    }
-  }
 
   @action
   void incrementSellerCount() {
@@ -145,18 +46,19 @@ abstract class _SellerStore with Store {
 
   @action
   void setupSellerCountListener() {
-    _firestore
-        .collection('users')
-        .where('role', isEqualTo: UserRole.seller.name)
-        .snapshots()
-        .listen((snapshot) {
-          sellerCount = snapshot.docs.length;
-          debugPrint('Seller count updated: $sellerCount');
-        })
-        .onError((error) {
-          debugPrint('Error in seller count listener: $error');
-          errorMessage = 'Failed to track seller count updates';
-        });
+    _firestore.collection('sellers').snapshots().listen((snapshot) {
+      sellerCount = snapshot.docs.length;
+    });
+  }
+
+  @action
+  Future<void> loadSellerCount() async {
+    try {
+      final snapshot = await _firestore.collection('sellers').get();
+      sellerCount = snapshot.docs.length;
+    } catch (e) {
+      debugPrint('Error loading seller count: $e');
+    }
   }
 
   @action
@@ -180,14 +82,6 @@ abstract class _SellerStore with Store {
       final userId = _auth.currentUser?.uid;
       if (userId == null) throw Exception('User not authenticated');
 
-      // Commented out for now - biometric verification
-      // First, verify biometric authentication
-      // final biometricVerified = await authenticateWithBiometrics();
-      // if (!biometricVerified) {
-      //   throw Exception('Biometric verification required');
-      // }
-      final biometricVerified = true; // Skip biometric verification for now
-
       // Upload ID verification image
       final idRef = _storage.ref(
         'seller_verifications/$userId/id_verification_${DateTime.now().millisecondsSinceEpoch}.jpg',
@@ -201,12 +95,6 @@ abstract class _SellerStore with Store {
       );
       await faceRef.putFile(File(faceImagePath));
       final faceImageUrl = await faceRef.getDownloadURL();
-
-      // Create biometric data hash (simplified - in production use proper encryption)
-      final biometricData = _generateBiometricHash(
-        userId,
-        DateTime.now().toIso8601String(),
-      );
 
       // Create verification request
       final verificationRequest = SellerVerificationRequest(
@@ -224,8 +112,6 @@ abstract class _SellerStore with Store {
         idNumber: idNumber,
         idImageUrl: idImageUrl,
         faceVerificationUrl: faceImageUrl,
-        biometricVerified: true,
-        biometricData: biometricData,
         status: VerificationStatus.pending,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -236,6 +122,16 @@ abstract class _SellerStore with Store {
           .collection('seller_verification_requests')
           .add(verificationRequest.toJson());
 
+      // Create notification for the user
+      final notificationStore = NotificationStore();
+      await notificationStore.createNotification(
+        userId: userId,
+        title: 'Application Submitted',
+        message:
+            'Your seller application is being processed. We will review your application and notify you once it\'s approved or if additional information is needed.',
+        type: NotificationType.sellerApproval,
+      );
+
       debugPrint('Seller verification request submitted successfully');
     } catch (e) {
       errorMessage = e.toString();
@@ -243,13 +139,6 @@ abstract class _SellerStore with Store {
     } finally {
       isLoading = false;
     }
-  }
-
-  String _generateBiometricHash(String userId, String timestamp) {
-    // Simple hash generation - in production, use proper cryptographic methods
-    final data = '$userId-$timestamp-${DateTime.now().millisecondsSinceEpoch}';
-    final bytes = utf8.encode(data);
-    return base64Encode(bytes);
   }
 
   @action

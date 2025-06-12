@@ -63,92 +63,6 @@ mixin _$SellerStore on _SellerStore, Store {
     });
   }
 
-  late final _$biometricCheckAvailableAtom = Atom(
-    name: '_SellerStore.biometricCheckAvailable',
-    context: context,
-  );
-
-  @override
-  bool get biometricCheckAvailable {
-    _$biometricCheckAvailableAtom.reportRead();
-    return super.biometricCheckAvailable;
-  }
-
-  @override
-  set biometricCheckAvailable(bool value) {
-    _$biometricCheckAvailableAtom.reportWrite(
-      value,
-      super.biometricCheckAvailable,
-      () {
-        super.biometricCheckAvailable = value;
-      },
-    );
-  }
-
-  late final _$biometricAuthenticatedAtom = Atom(
-    name: '_SellerStore.biometricAuthenticated',
-    context: context,
-  );
-
-  @override
-  bool get biometricAuthenticated {
-    _$biometricAuthenticatedAtom.reportRead();
-    return super.biometricAuthenticated;
-  }
-
-  @override
-  set biometricAuthenticated(bool value) {
-    _$biometricAuthenticatedAtom.reportWrite(
-      value,
-      super.biometricAuthenticated,
-      () {
-        super.biometricAuthenticated = value;
-      },
-    );
-  }
-
-  late final _$availableBiometricsAtom = Atom(
-    name: '_SellerStore.availableBiometrics',
-    context: context,
-  );
-
-  @override
-  List<BiometricType> get availableBiometrics {
-    _$availableBiometricsAtom.reportRead();
-    return super.availableBiometrics;
-  }
-
-  @override
-  set availableBiometrics(List<BiometricType> value) {
-    _$availableBiometricsAtom.reportWrite(value, super.availableBiometrics, () {
-      super.availableBiometrics = value;
-    });
-  }
-
-  late final _$initializeBiometricsAsyncAction = AsyncAction(
-    '_SellerStore.initializeBiometrics',
-    context: context,
-  );
-
-  @override
-  Future<void> initializeBiometrics() {
-    return _$initializeBiometricsAsyncAction.run(
-      () => super.initializeBiometrics(),
-    );
-  }
-
-  late final _$authenticateWithBiometricsAsyncAction = AsyncAction(
-    '_SellerStore.authenticateWithBiometrics',
-    context: context,
-  );
-
-  @override
-  Future<bool> authenticateWithBiometrics() {
-    return _$authenticateWithBiometricsAsyncAction.run(
-      () => super.authenticateWithBiometrics(),
-    );
-  }
-
   late final _$loadSellerCountAsyncAction = AsyncAction(
     '_SellerStore.loadSellerCount',
     context: context,
@@ -289,10 +203,7 @@ mixin _$SellerStore on _SellerStore, Store {
     return '''
 isLoading: ${isLoading},
 errorMessage: ${errorMessage},
-sellerCount: ${sellerCount},
-biometricCheckAvailable: ${biometricCheckAvailable},
-biometricAuthenticated: ${biometricAuthenticated},
-availableBiometrics: ${availableBiometrics}
+sellerCount: ${sellerCount}
     ''';
   }
 }

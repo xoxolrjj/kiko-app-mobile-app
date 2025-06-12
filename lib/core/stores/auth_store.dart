@@ -411,6 +411,8 @@ abstract class _AuthStore with Store {
       await _auth.signOut();
       currentUser = null;
       currentAdmin = null;
+      isLoading = false; // Reset loading state on sign out
+      errorMessage = null; // Clear any error messages
       AuthRefreshNotifier().refresh();
     } catch (e) {
       errorMessage = 'Failed to sign out';
