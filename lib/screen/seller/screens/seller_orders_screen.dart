@@ -210,11 +210,11 @@ class _SellerOrdersScreenState extends State<SellerOrdersScreen>
       switch (newStatus) {
         case OrderStatus.accepted:
           updateData['acceptedAt'] = FieldValue.serverTimestamp();
+          // Create delivery record for admin approval when order is accepted
+          await _createDeliveryRecord(orderId);
           break;
         case OrderStatus.ready:
           updateData['readyAt'] = FieldValue.serverTimestamp();
-          // Create delivery record for admin approval
-          await _createDeliveryRecord(orderId);
           break;
         case OrderStatus.shipped:
           updateData['shippedAt'] = FieldValue.serverTimestamp();
@@ -293,13 +293,27 @@ class _SellerOrdersScreenState extends State<SellerOrdersScreen>
 
       if (existingDeliveryQuery.docs.isNotEmpty) return;
 
+      // Convert order items to delivery items format
+      final orderItems = (orderData['items'] as List<dynamic>?) ?? [];
+      final deliveryItems =
+          orderItems.map((item) {
+            final itemData = item as Map<String, dynamic>;
+            return {
+              'productId': itemData['productId'] ?? '',
+              'productName': itemData['productName'] ?? '',
+              'quantity': itemData['quantity'] ?? 0,
+              'price':
+                  itemData['pricePerUnit'] ?? 0.0, // Use pricePerUnit as price
+            };
+          }).toList();
+
       // Create delivery record
       await FirebaseFirestore.instance.collection('deliveries').add({
         'orderId': orderId,
         'customerId': orderData['buyerId'],
         'customerName': orderData['buyerName'],
         'deliveryAddress': orderData['deliveryAddress'],
-        'items': orderData['items'],
+        'items': deliveryItems,
         'status': 'pending',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),

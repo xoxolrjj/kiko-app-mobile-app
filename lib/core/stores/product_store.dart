@@ -15,12 +15,12 @@ class ProductStore = _ProductStore with _$ProductStore;
 
 abstract class _ProductStore with Store {
   final FirebaseFirestore _firestore;
-    FirebaseStorage _storage = sl<FirebaseStorage>();
+  FirebaseStorage _storage = sl<FirebaseStorage>();
   final FirebaseAuth _auth = sl<FirebaseAuth>();
 
   _ProductStore()
-      : _firestore = FirebaseFirestore.instance,
-        _storage = FirebaseStorage.instance;
+    : _firestore = FirebaseFirestore.instance,
+      _storage = FirebaseStorage.instance;
 
   @observable
   ObservableList<ProductModel> products = ObservableList<ProductModel>();
@@ -54,8 +54,7 @@ abstract class _ProductStore with Store {
         snapshot.docs
             .map((doc) => ProductModel.fromSnapshot(doc))
             .where(
-              (product) =>
-                  product.id.isNotEmpty && product.name.isNotEmpty,
+              (product) => product.id.isNotEmpty && product.name.isNotEmpty,
             )
             .toList(),
       );
@@ -89,7 +88,6 @@ abstract class _ProductStore with Store {
       isLoading = false;
     }
   }
- 
 
   Future<String> _uploadImage(File imageFile) async {
     try {
@@ -100,22 +98,25 @@ abstract class _ProductStore with Store {
 
       // Read file as bytes
       final bytes = await imageFile.readAsBytes();
-      
+
       // Create a unique filename
       String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      
+
       // Create storage reference
       final storageRef = _storage.ref().child('images/$fileName');
-      
+
       debugPrint('Starting upload to: images/$fileName');
-      
+
       // Upload bytes directly
-      await storageRef.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
-      
+      await storageRef.putData(
+        bytes,
+        SettableMetadata(contentType: 'image/jpeg'),
+      );
+
       // Get download URL
       String downloadURL = await storageRef.getDownloadURL();
       debugPrint('Upload successful. URL: $downloadURL');
-      
+
       return downloadURL;
     } catch (e) {
       debugPrint('Error uploading image: $e');
@@ -127,7 +128,6 @@ abstract class _ProductStore with Store {
     }
   }
 
-
   // Future<String?> _uploadImage() async {
   //   if (_imageFile == null) return _profileImageUrl;
 
@@ -137,10 +137,10 @@ abstract class _ProductStore with Store {
 
   //     // Create a reference to the file location in Firebase Storage
   //     final storageRef = _storage.ref().child('profile_images/${user.uid}');
-      
+
   //     // Upload the file
   //     final uploadTask = await storageRef.putFile(_imageFile!);
-      
+
   //     // Get the download URL
   //     final downloadUrl = await uploadTask.ref.getDownloadURL();
   //     return downloadUrl;
@@ -241,7 +241,7 @@ abstract class _ProductStore with Store {
     try {
       // Get the product to find its image URL
       final product = products.firstWhere((p) => p.id == productId);
-      
+
       // Delete the image from Firebase Storage if it exists
       if (product.imagePath.isNotEmpty) {
         try {

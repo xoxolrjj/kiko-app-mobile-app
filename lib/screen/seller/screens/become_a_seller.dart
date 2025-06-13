@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -133,7 +134,7 @@ class _BecomeASellerState extends State<BecomeASeller> {
   }
 
   Future<void> _submitVerificationRequest() async {
-    if (!_validateAllSteps()) return;
+    // if (!_validateAllSteps()) return;
 
     final sellerStore = context.read<SellerStore>();
     final authStore = context.read<AuthStore>();
@@ -188,41 +189,41 @@ class _BecomeASellerState extends State<BecomeASeller> {
     }
   }
 
-  bool _validateAllSteps() {
-    // Validate shop information form
-    if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please complete all shop information fields'),
-        ),
-      );
-      return false;
-    }
+  // bool _validateAllSteps() {
+  //   // Validate shop information form
+  //   if (!_formKey.currentState!.validate()) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Please complete all shop information fields'),
+  //       ),
+  //     );
+  //     return false;
+  //   }
 
-    // Validate verification form
-    if (!_verificationFormKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please complete all verification fields'),
-        ),
-      );
-      return false;
-    }
+  // Validate verification form
+  // if (!_verificationFormKey.currentState!.validate()) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       content: Text('Please complete all verification fields'),
+  //     ),
+  //   );
+  //   return false;
+  // }
 
-    if (_idImagePath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please upload your ID document')),
-      );
-      return false;
-    }
-    if (_faceImagePath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please take a face verification photo')),
-      );
-      return false;
-    }
-    return true;
-  }
+  // if (_idImagePath == null) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text('Please upload your ID document')),
+  //   );
+  //   return false;
+  // }
+  // if (_faceImagePath == null) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text('Please take a face verification photo')),
+  //   );
+  //   return false;
+  // }
+  //   return true;
+  // }
 
   void _nextStep() {
     if (_currentStep < 1) {
@@ -269,6 +270,10 @@ class _BecomeASellerState extends State<BecomeASeller> {
     if (_isSeller) {
       return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            onPressed: () => context.go('/home'),
+            icon: const Icon(Icons.arrow_back),
+          ),
           title: const Text('Seller Dashboard'),
           backgroundColor: Theme.of(context).primaryColor,
           foregroundColor: Colors.white,
@@ -300,7 +305,7 @@ class _BecomeASellerState extends State<BecomeASeller> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => context.go('/seller-dashboard'),
+                  onPressed: () => context.go('/profile'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
@@ -566,9 +571,7 @@ class _BecomeASellerState extends State<BecomeASeller> {
                 if (value == null || value.trim().isEmpty) {
                   return 'Please enter your shop name';
                 }
-                if (value.trim().length < 3) {
-                  return 'Shop name must be at least 3 characters';
-                }
+
                 return null;
               },
             ),
@@ -583,13 +586,17 @@ class _BecomeASellerState extends State<BecomeASeller> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.phone),
               ),
+              maxLength: 10,
               keyboardType: TextInputType.phone,
               validator: (value) {
-                if (value == null || value.trim().isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please enter your contact number';
                 }
-                if (value.trim().length < 10) {
-                  return 'Please enter a valid contact number';
+                if (value.length != 10) {
+                  return 'Please enter a valid 10-digit contact number';
+                }
+                if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                  return 'Please enter only numbers';
                 }
                 return null;
               },
@@ -610,9 +617,7 @@ class _BecomeASellerState extends State<BecomeASeller> {
                 if (value == null || value.trim().isEmpty) {
                   return 'Please enter your shop location';
                 }
-                if (value.trim().length < 10) {
-                  return 'Please provide a detailed location';
-                }
+
                 return null;
               },
             ),
@@ -674,6 +679,10 @@ class _BecomeASellerState extends State<BecomeASeller> {
             // ID Number
             TextFormField(
               controller: _idNumberController,
+              keyboardType: TextInputType.phone,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.deny(RegExp(r'[a-zA-Z]')),
+              ],
               decoration: const InputDecoration(
                 labelText: 'ID Number',
                 hintText: 'Enter your ID number',
@@ -688,6 +697,21 @@ class _BecomeASellerState extends State<BecomeASeller> {
               },
             ),
             const SizedBox(height: 24),
+            Text(
+              'Upload ID Document',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Note: The ID document must be clear and readable, and the face photo must be taken in a well-lit environment.',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 16),
 
             // ID Image Upload
             _buildUploadCard(
@@ -701,6 +725,21 @@ class _BecomeASellerState extends State<BecomeASeller> {
             ),
             const SizedBox(height: 16),
 
+            // Face Photo Upload
+            Text(
+              'Face Verification',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            Text(
+              'Take a clear photo of your face',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 16),
             // Face Photo Upload
             _buildUploadCard(
               title: 'Take Face Photo',

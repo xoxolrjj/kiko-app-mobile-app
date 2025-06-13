@@ -80,7 +80,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => context.pop(),
+          onPressed: () {
+            // Navigate back based on user role
+            if (authStore.currentUser?.role == UserRole.seller) {
+              context.go('/seller/products');
+            } else if (authStore.currentUser?.role == UserRole.user) {
+              context.go('/products');
+            } else {
+              context.go('/admin');
+            }
+          },
           icon: const Icon(Icons.arrow_back),
         ),
         title: Text(widget.product.name),

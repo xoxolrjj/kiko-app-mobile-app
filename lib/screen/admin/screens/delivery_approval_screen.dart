@@ -233,11 +233,11 @@ class _DeliveryCard extends StatelessWidget {
               label: 'Address',
               value: delivery.deliveryAddress,
             ),
-            _InfoRow(
-              icon: Icons.inventory,
-              label: 'Items',
-              value: '${delivery.items.length} items',
-            ),
+            // _InfoRow(
+            //   icon: Icons.inventory,
+            //   label: 'Items',
+            //   value: '${delivery.items.length} items',
+            // ),
             _InfoRow(
               icon: Icons.access_time,
               label: 'Created',

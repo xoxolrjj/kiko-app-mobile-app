@@ -158,11 +158,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Contact Number',
                   border: OutlineInputBorder(),
+                  prefixText: '+63 ',
                 ),
                 keyboardType: TextInputType.phone,
+                maxLength: 10,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your contact number';
+                  }
+                  if (value.length != 10) {
+                    return 'Please enter a valid 10-digit contact number';
+                  }
+                  if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                    return 'Please enter only numbers';
                   }
                   return null;
                 },
@@ -201,12 +209,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
+                maxLength: 2,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your age';
                   }
                   if (int.tryParse(value) == null) {
                     return 'Please enter a valid age';
+                  }
+                  final age = int.parse(value);
+                  if (age < 1 || age > 99) {
+                    return 'Age must be between 1 and 99';
                   }
                   return null;
                 },

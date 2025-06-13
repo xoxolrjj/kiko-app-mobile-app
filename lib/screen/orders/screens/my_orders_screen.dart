@@ -282,6 +282,27 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                if (_canCancelOrder()) ...[
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => context.go('/cancel-order/${order.id}'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        'Cancel Order',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -351,53 +372,49 @@ class _OrderCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Order Timeline'),
-        const SizedBox(height: 12),
-        _buildTimelineStep('Order Placed', order.createdAt, true),
+        const SizedBox(height: 8),
+        _TimelineItem(
+          icon: Icons.shopping_cart,
+          title: 'Order Placed',
+          date: order.createdAt,
+          isCompleted: true,
+        ),
         if (order.acceptedAt != null)
-          _buildTimelineStep('Order Accepted', order.acceptedAt!, true),
+          _TimelineItem(
+            icon: Icons.check_circle,
+            title: 'Order Accepted',
+            date: order.acceptedAt!,
+            isCompleted: true,
+          ),
         if (order.readyAt != null)
-          _buildTimelineStep('Order Ready', order.readyAt!, true),
+          _TimelineItem(
+            icon: Icons.kitchen,
+            title: 'Order Ready',
+            date: order.readyAt!,
+            isCompleted: true,
+          ),
         if (order.shippedAt != null)
-          _buildTimelineStep('Order Shipped', order.shippedAt!, true),
+          _TimelineItem(
+            icon: Icons.local_shipping,
+            title: 'Order Shipped',
+            date: order.shippedAt!,
+            isCompleted: true,
+          ),
         if (order.deliveredAt != null)
-          _buildTimelineStep('Order Delivered', order.deliveredAt!, true),
+          _TimelineItem(
+            icon: Icons.done_all,
+            title: 'Order Delivered',
+            date: order.deliveredAt!,
+            isCompleted: true,
+          ),
       ],
     );
   }
 
-  Widget _buildTimelineStep(String title, DateTime date, bool isCompleted) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(
-            isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isCompleted ? Colors.green : Colors.grey,
-            size: 20,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight:
-                        isCompleted ? FontWeight.bold : FontWeight.normal,
-                    color: isCompleted ? Colors.black : Colors.grey,
-                  ),
-                ),
-                Text(
-                  _formatDate(date),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  bool _canCancelOrder() {
+    return order.status == OrderStatus.pending ||
+        order.status == OrderStatus.accepted ||
+        order.status == OrderStatus.preparing;
   }
 
   Color _getStatusColor(OrderStatus status) {
@@ -467,5 +484,59 @@ class _InfoRow extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _TimelineItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final DateTime date;
+  final bool isCompleted;
+
+  const _TimelineItem({
+    required this.icon,
+    required this.title,
+    required this.date,
+    required this.isCompleted,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(
+            isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+            color: isCompleted ? Colors.green : Colors.grey,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight:
+                        isCompleted ? FontWeight.bold : FontWeight.normal,
+                    color: isCompleted ? Colors.black : Colors.grey,
+                  ),
+                ),
+                Text(
+                  _formatDate(date),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 }

@@ -12,6 +12,7 @@ enum NotificationType {
   orderDelivered,
   accountRestricted,
   newOrder,
+  orderCancelled,
 }
 
 @freezed

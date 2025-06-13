@@ -225,7 +225,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         title: const Text('Checkout'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/product-details/${widget.product.id}'),
+          onPressed:
+              () => context.go('/product-details', extra: widget.product),
         ),
       ),
       body: SingleChildScrollView(

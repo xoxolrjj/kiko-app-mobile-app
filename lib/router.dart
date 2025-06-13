@@ -28,9 +28,11 @@ import 'package:kiko_app_mobile_app/screen/messaging/screens/conversation_detail
 import 'package:kiko_app_mobile_app/screen/seller/screens/seller_message_screen.dart';
 import 'package:kiko_app_mobile_app/core/models/user_model.dart';
 import 'package:kiko_app_mobile_app/screen/admin/screens/banner_management_screen.dart';
+import 'package:kiko_app_mobile_app/screen/admin/screens/product_management_screen.dart';
 import 'package:kiko_app_mobile_app/screen/notifications/screens/notifications_screen.dart'
     as user_notifications;
 import 'package:kiko_app_mobile_app/core/stores/notification_store.dart';
+import 'package:kiko_app_mobile_app/screen/orders/screens/cancel_order_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -144,6 +146,7 @@ final goRouter = GoRouter(
       path: '/seller/products',
       builder: (context, state) => const SellerProductsScreen(),
     ),
+
     GoRoute(
       path: '/seller/orders',
       builder: (context, state) => const SellerOrdersScreen(),
@@ -164,6 +167,12 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/my-orders',
       builder: (context, state) => const MyOrdersScreen(),
+    ),
+    GoRoute(
+      path: '/cancel-order/:orderId',
+      builder:
+          (context, state) =>
+              CancelOrderScreen(orderId: state.pathParameters['orderId']!),
     ),
 
     // Messages routes
@@ -192,6 +201,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/admin/banner',
       builder: (context, state) => const BannerManagementScreen(),
+    ),
+    GoRoute(
+      path: '/admin/products',
+      builder: (context, state) => const ProductManagementScreen(),
     ),
     GoRoute(
       path: '/admin/seller-requests',
