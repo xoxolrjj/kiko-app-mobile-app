@@ -161,30 +161,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   radius: 50,
                   backgroundColor: Colors.white.withOpacity(0.2),
                   child:
-                      sellerData?['profilePhotoUrl'] != null
-                          ? ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: sellerData!['profilePhotoUrl'],
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              placeholder:
-                                  (context, url) =>
-                                      const CircularProgressIndicator(),
-                              errorWidget:
-                                  (context, url, error) => const Icon(
-                                    Icons.person,
-                                    size: 50,
-                                    color: Colors.white,
-                                  ),
+                      isLoadingSeller
+                          ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
                             ),
                           )
-                          : KikoImage(
-                            imagePath: user.photoUrl ?? '',
-                            width: 100,
-                            height: 100,
-                            isCircular: true,
-                          ),
+                          : _buildProfileImage(user, isSeller),
                 ),
                 Positioned(
                   bottom: 0,
@@ -274,6 +257,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildProfileImage(UserModel user, bool isSeller) {
+    // Check for profile photo URL from multiple sources
+    String? photoUrl;
+
+    if (isSeller && sellerData != null) {
+      // For sellers, check both seller data and user data
+      photoUrl =
+          sellerData!['photoUrl'] ??
+          sellerData!['profilePhotoUrl'] ??
+          user.photoUrl;
+    } else {
+      // For regular users
+      photoUrl = user.photoUrl;
+    }
+
+    if (photoUrl != null && photoUrl.isNotEmpty) {
+      return ClipOval(
+        child: CachedNetworkImage(
+          imageUrl: photoUrl,
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+          placeholder:
+              (context, url) => const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+          errorWidget:
+              (context, url, error) =>
+                  const Icon(Icons.person, size: 50, color: Colors.white),
+        ),
+      );
+    }
+
+    return const Icon(Icons.person, size: 50, color: Colors.white);
+  }
+
   Future<void> _pickAndUploadImage() async {
     try {
       final ImagePicker picker = ImagePicker();
@@ -288,30 +307,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       setState(() => isLoadingSeller = true);
 
+      final authStore = Provider.of<AuthStore>(context, listen: false);
+      final userId = authStore.currentUser!.id;
+      final isSeller = authStore.currentUser?.role == UserRole.seller;
+
       // Upload to Firebase Storage
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('profile_photos')
-          .child(
-            '${Provider.of<AuthStore>(context, listen: false).currentUser!.id}.jpg',
-          );
+          .child('$userId.jpg');
 
       await storageRef.putFile(File(image.path));
       final downloadUrl = await storageRef.getDownloadURL();
 
-      // Update Firestore
-      final authStore = Provider.of<AuthStore>(context, listen: false);
-      if (authStore.currentUser?.role == UserRole.seller) {
-        await FirebaseFirestore.instance
+      // Update both user and seller collections
+      final batch = FirebaseFirestore.instance.batch();
+
+      // Update user collection
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId);
+      batch.update(userRef, {'photoUrl': downloadUrl});
+
+      // Update seller collection if user is a seller
+      if (isSeller) {
+        final sellerRef = FirebaseFirestore.instance
             .collection('sellers')
-            .doc(authStore.currentUser!.id)
-            .update({'photoUrl': downloadUrl});
-      } else {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(authStore.currentUser!.id)
-            .update({'photoUrl': downloadUrl});
+            .doc(userId);
+        batch.update(sellerRef, {'photoUrl': downloadUrl});
       }
+
+      // Commit all updates
+      await batch.commit();
+
+      // Update local auth store
+      await authStore.getUserData(userId);
 
       // Reload seller data
       await _loadSellerData();
@@ -457,7 +487,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
- 
 class _ActionCard extends StatelessWidget {
   final String title;
   final String subtitle;

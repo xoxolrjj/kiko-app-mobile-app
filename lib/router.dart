@@ -260,7 +260,10 @@ final goRouter = GoRouter(
         GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
         GoRoute(
           path: '/products',
-          builder: (context, state) => const ProductScreen(),
+          builder: (context, state) {
+            final category = state.extra as ProductCategory?;
+            return ProductScreen(category: category);
+          },
         ),
         GoRoute(
           path: '/messages',

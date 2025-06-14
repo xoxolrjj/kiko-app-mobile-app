@@ -126,6 +126,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case NotificationType.orderShipped:
       case NotificationType.orderDelivered:
       case NotificationType.orderCancelled:
+      case NotificationType.orderAccepted:
+      case NotificationType.orderPreparing:
         if (notification.orderId != null) {
           context.go('/my-orders');
         }
@@ -226,6 +228,10 @@ class _NotificationCard extends StatelessWidget {
         return Icons.notifications_active;
       case NotificationType.orderCancelled:
         return Icons.cancel;
+      case NotificationType.orderAccepted:
+        return Icons.check_circle;
+      case NotificationType.orderPreparing:
+        return Icons.build;
     }
   }
 
@@ -245,6 +251,10 @@ class _NotificationCard extends StatelessWidget {
         return Colors.purple;
       case NotificationType.orderCancelled:
         return Colors.red;
+      case NotificationType.orderAccepted:
+        return Colors.green;
+      case NotificationType.orderPreparing:
+        return Colors.orange;
     }
   }
 

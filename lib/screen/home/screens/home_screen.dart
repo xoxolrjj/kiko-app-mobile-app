@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _navigateToCategory(BuildContext context, ProductCategory category) {
-    context.go('/products', extra: {'category': category});
+    context.go('/products', extra: category);
   }
 
   Widget _buildSpecialCard(

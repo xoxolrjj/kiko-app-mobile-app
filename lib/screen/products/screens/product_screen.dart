@@ -13,9 +13,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 class ProductScreen extends StatefulWidget {
-  final Map<String, dynamic>? extra;
+  final ProductCategory? category;
 
-  const ProductScreen({super.key, this.extra});
+  const ProductScreen({super.key, this.category});
 
   @override
   State<ProductScreen> createState() => _ProductScreenState();
@@ -33,9 +33,8 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   void _handleInitialCategory() {
-    if (widget.extra != null && widget.extra!['category'] != null) {
-      final category = widget.extra!['category'] as ProductCategory;
-      _productStore.setSelectedCategory(category);
+    if (widget.category != null) {
+      _productStore.setSelectedCategory(widget.category);
     }
   }
 
@@ -56,20 +55,20 @@ class _ProductScreenState extends State<ProductScreen> {
             ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           centerTitle: false,
-          // actions: [
-          //   // ElevatedButton.icon(
-          //   //   onPressed: () => _generateDummyData(context),
-          //   //   icon: const Icon(Icons.add),
-          //   //   label: const Text('Add Dummy Data'),
-          //   // ),
-          //   ElevatedButton.icon(
-          //     onPressed: () {
-          //       context.push('/create-product');
-          //     },
-          //     icon: const Icon(Icons.add),
-          //     label: const Text('Create Product'),
-          //   ),
-          // ],
+          actions: [
+            ElevatedButton.icon(
+              onPressed: () => _generateDummyData(context),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Dummy Data'),
+            ),
+            //   ElevatedButton.icon(
+            //     onPressed: () {
+            //       context.push('/create-product');
+            //     },
+            //     icon: const Icon(Icons.add),
+            //     label: const Text('Create Product'),
+            //   ),
+          ],
           elevation: 1,
         ),
         body: SafeArea(
@@ -78,31 +77,33 @@ class _ProductScreenState extends State<ProductScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row(
-                //   children: [
-                //     ElevatedButton.icon(
-                //       onPressed: () => _generateDummyData(context),
-                //       icon: const Icon(Icons.add),
-                //       label: const Text('Add Dummy Data'),
-                //     ),
-                //     const SizedBox(width: 8),
-
-                //   ],
-                // ),
-                //    const SizedBox(height: 16),
-                TextField(
-                  onChanged: _productStore.searchProducts,
-                  decoration: InputDecoration(
-                    labelText: 'Search Products',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                // Show search and category filter only when not coming from home category selection
+                if (widget.category == null) ...[
+                  TextField(
+                    onChanged: _productStore.searchProducts,
+                    decoration: InputDecoration(
+                      labelText: 'Search Products',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      prefixIcon: const Icon(Icons.search),
                     ),
-                    prefixIcon: const Icon(Icons.search),
                   ),
-                ),
-                const SizedBox(height: 24),
-                _buildCategoryFilter(context),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 24),
+                  _buildCategoryFilter(context),
+                  const SizedBox(height: 16),
+                ],
+                // Show category title when coming from home category selection
+                if (widget.category != null) ...[
+                  Text(
+                    '${widget.category!.name.toUpperCase()} PRODUCTS',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 Expanded(child: _buildProductGrid(context)),
               ],
             ),

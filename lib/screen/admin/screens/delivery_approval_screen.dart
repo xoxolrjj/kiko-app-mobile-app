@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kiko_app_mobile_app/core/models/delivery_model.dart';
+import 'package:kiko_app_mobile_app/core/services/notification_service.dart';
 
 class DeliveryApprovalScreen extends StatefulWidget {
   const DeliveryApprovalScreen({super.key});
@@ -132,6 +133,18 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen>
       final deliveryData = deliveryDoc.data() as Map<String, dynamic>;
       final orderId = deliveryData['orderId'] as String;
 
+      // Get order data for notifications
+      final orderDoc =
+          await FirebaseFirestore.instance
+              .collection('orders')
+              .doc(orderId)
+              .get();
+
+      if (!orderDoc.exists) return;
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+      final notificationService = NotificationService();
+
       // Update the order status based on delivery status
       String orderStatus;
       switch (status) {
@@ -148,6 +161,13 @@ class _DeliveryApprovalScreenState extends State<DeliveryApprovalScreen>
       // Update order status
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update(
         {'status': orderStatus, 'updatedAt': FieldValue.serverTimestamp()},
+      );
+
+      // Send notifications for admin-initiated status changes
+      await notificationService.sendOrderStatusNotifications(
+        orderId: orderId,
+        newStatus: orderStatus,
+        orderData: orderData,
       );
 
       if (mounted) {

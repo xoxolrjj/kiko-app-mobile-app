@@ -37,8 +37,11 @@ Map<String, dynamic> _$$NotificationModelImplToJson(
 const _$NotificationTypeEnumMap = {
   NotificationType.sellerApproval: 'sellerApproval',
   NotificationType.orderPlaced: 'orderPlaced',
+  NotificationType.orderAccepted: 'orderAccepted',
+  NotificationType.orderPreparing: 'orderPreparing',
   NotificationType.orderShipped: 'orderShipped',
   NotificationType.orderDelivered: 'orderDelivered',
   NotificationType.accountRestricted: 'accountRestricted',
   NotificationType.newOrder: 'newOrder',
+  NotificationType.orderCancelled: 'orderCancelled',
 };

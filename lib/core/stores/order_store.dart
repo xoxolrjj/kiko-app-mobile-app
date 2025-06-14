@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kiko_app_mobile_app/core/models/order_model.dart';
 import 'package:kiko_app_mobile_app/core/stores/notification_store.dart';
 import 'package:kiko_app_mobile_app/core/models/notification_model.dart';
+import 'package:kiko_app_mobile_app/core/services/notification_service.dart';
 
 class OrderStore {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NotificationStore _notificationStore = NotificationStore();
+  final NotificationService _notificationService = NotificationService();
 
   Future<void> cancelOrder(String orderId, String reason) async {
     try {
@@ -36,24 +38,11 @@ class OrderStore {
         'rejectionReason': reason,
       });
 
-      // Send notification to buyer
-      await _notificationStore.createNotification(
-        userId: orderData['buyerId'],
-        title: 'Order Cancelled',
-        message:
-            'Your order #${orderId.substring(0, 8)} has been cancelled. Reason: $reason',
-        type: NotificationType.orderCancelled,
+      // Send comprehensive notifications using notification service
+      await _notificationService.sendOrderStatusNotifications(
         orderId: orderId,
-      );
-
-      // Send notification to seller
-      await _notificationStore.createNotification(
-        userId: orderData['sellerId'],
-        title: 'Order Cancelled',
-        message:
-            'Order #${orderId.substring(0, 8)} has been cancelled. Reason: $reason',
-        type: NotificationType.orderCancelled,
-        orderId: orderId,
+        newStatus: 'cancelled',
+        orderData: orderData,
       );
     } catch (e) {
       throw Exception('Failed to cancel order: $e');

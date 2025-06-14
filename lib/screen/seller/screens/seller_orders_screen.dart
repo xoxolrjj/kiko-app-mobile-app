@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:kiko_app_mobile_app/core/services/notification_service.dart';
 
 enum OrderStatus {
   pending,
@@ -201,6 +202,20 @@ class _SellerOrdersScreenState extends State<SellerOrdersScreen>
 
   Future<void> _updateOrderStatus(String orderId, OrderStatus newStatus) async {
     try {
+      // Get order data first for notifications
+      final orderDoc =
+          await FirebaseFirestore.instance
+              .collection('orders')
+              .doc(orderId)
+              .get();
+
+      if (!orderDoc.exists) {
+        throw Exception('Order not found');
+      }
+
+      final orderData = orderDoc.data() as Map<String, dynamic>;
+      final notificationService = NotificationService();
+
       Map<String, dynamic> updateData = {
         'status': newStatus.name,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -230,6 +245,13 @@ class _SellerOrdersScreenState extends State<SellerOrdersScreen>
           .collection('orders')
           .doc(orderId)
           .update(updateData);
+
+      // Send notifications for status changes
+      await notificationService.sendOrderStatusNotifications(
+        orderId: orderId,
+        newStatus: newStatus.name,
+        orderData: orderData,
+      );
 
       // If marking as delivered, update the delivery record
       if (newStatus == OrderStatus.delivered) {

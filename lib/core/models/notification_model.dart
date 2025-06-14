@@ -8,6 +8,8 @@ part 'notification_model.g.dart';
 enum NotificationType {
   sellerApproval,
   orderPlaced,
+  orderAccepted,
+  orderPreparing,
   orderShipped,
   orderDelivered,
   accountRestricted,
