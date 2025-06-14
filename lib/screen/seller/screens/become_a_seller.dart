@@ -259,6 +259,10 @@ class _BecomeASellerState extends State<BecomeASeller> {
     if (_isCheckingSeller) {
       return Scaffold(
         appBar: AppBar(
+          // leading: IconButton(
+          //   onPressed: () => context.go('/home'),
+          //   icon: const Icon(Icons.arrow_back),
+          // ),
           title: const Text('Become a Seller'),
           backgroundColor: Theme.of(context).primaryColor,
           foregroundColor: Colors.white,
@@ -401,7 +405,7 @@ class _BecomeASellerState extends State<BecomeASeller> {
                 const SizedBox(height: 24),
                 if (_applicationStatus == 'approved')
                   ElevatedButton(
-                    onPressed: () => context.go('/seller-dashboard'),
+                    onPressed: () => context.go('/home'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white,
@@ -438,6 +442,10 @@ class _BecomeASellerState extends State<BecomeASeller> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.go('/home'),
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: const Text('Become a Seller'),
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
@@ -585,6 +593,7 @@ class _BecomeASellerState extends State<BecomeASeller> {
                 hintText: 'Enter your contact number',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.phone),
+                prefixText: '+63 ',
               ),
               maxLength: 10,
               keyboardType: TextInputType.phone,

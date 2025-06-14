@@ -38,31 +38,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     });
 
     try {
-      // First try to get seller data from sellers collection
+      // Load both seller and user data to combine information
       final sellerDoc =
-          await FirebaseFirestore.instance
+          FirebaseFirestore.instance
               .collection('sellers')
               .doc(widget.product.sellerId)
               .get();
 
-      if (sellerDoc.exists) {
-        setState(() {
-          _sellerData = sellerDoc.data();
-          _isLoadingSeller = false;
-        });
-        return;
-      }
-
-      // If not found in sellers collection, get from users collection
       final userDoc =
-          await FirebaseFirestore.instance
+          FirebaseFirestore.instance
               .collection('users')
               .doc(widget.product.sellerId)
               .get();
 
-      if (userDoc.exists) {
+      // Wait for both documents
+      final results = await Future.wait([sellerDoc, userDoc]);
+      final sellerSnapshot = results[0];
+      final userSnapshot = results[1];
+
+      Map<String, dynamic> combinedData = {};
+
+      // Start with user data (contains name)
+      if (userSnapshot.exists) {
+        combinedData.addAll(userSnapshot.data() as Map<String, dynamic>);
+      }
+
+      // Override with seller-specific data (contains shop info)
+      if (sellerSnapshot.exists) {
+        combinedData.addAll(sellerSnapshot.data() as Map<String, dynamic>);
+      }
+
+      if (combinedData.isNotEmpty) {
         setState(() {
-          _sellerData = userDoc.data();
+          _sellerData = combinedData;
+          _isLoadingSeller = false;
+        });
+      } else {
+        setState(() {
           _isLoadingSeller = false;
         });
       }
@@ -294,7 +306,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         Provider.of<AuthStore>(context).currentUser?.role ==
                                 UserRole.seller
                             ? 'Sellers Cannot Purchase'
-                            : 'Buy Now',
+                            : Provider.of<AuthStore>(
+                                  context,
+                                ).currentUser?.role ==
+                                UserRole.user
+                            ? 'Buy Now'
+                            : 'Admin Cannot Purchase',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -346,10 +363,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       );
     }
 
-    final sellerName =
-        _sellerData!['businessName'] ??
-        _sellerData!['name'] ??
-        'Unknown Seller';
+    final sellerName = _sellerData!['name'] ?? 'Unknown Seller';
     final shopName = _sellerData!['shopName'] ?? 'Shop Name Not Available';
     final shopLocation =
         _sellerData!['shopLocation'] ?? 'Location Not Available';

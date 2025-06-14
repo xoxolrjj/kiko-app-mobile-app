@@ -120,7 +120,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   ) {
     switch (notification.type) {
       case NotificationType.sellerApproval:
-        context.go('/seller/dashboard');
+        context.go('/profile');
         break;
       case NotificationType.orderPlaced:
       case NotificationType.orderShipped:

@@ -137,7 +137,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
                   return _ProductCard(
                     product: product,
                     productId: filteredProducts[index].id,
-                    onDelete: () => _deleteProduct(filteredProducts[index].id),
+                    //    onDelete: () => _deleteProduct(filteredProducts[index].id),
                   );
                 },
               );
@@ -237,7 +237,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
                   return _ProductCard(
                     product: product,
                     productId: products[index].id,
-                    onDelete: () => _deleteProduct(products[index].id),
+                    // onDelete: () => _deleteProduct(products[index].id),
                   );
                 },
               );
@@ -302,7 +302,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
             return _SellerProductsCard(
               sellerId: sellerId,
               products: sellerProducts,
-              onDeleteProduct: _deleteProduct,
+              //  onDeleteProduct: _deleteProduct,
             );
           },
         );
@@ -310,67 +310,67 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
     );
   }
 
-  Future<void> _deleteProduct(String productId) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Delete Product'),
-            content: const Text(
-              'Are you sure you want to delete this product? This action cannot be undone.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('Delete'),
-              ),
-            ],
-          ),
-    );
+  // Future<void> _deleteProduct(String productId) async {
+  //   final confirmed = await showDialog<bool>(
+  //     context: context,
+  //     builder:
+  //         (context) => AlertDialog(
+  //           title: const Text('Delete Product'),
+  //           content: const Text(
+  //             'Are you sure you want to delete this product? This action cannot be undone.',
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.of(context).pop(false),
+  //               child: const Text('Cancel'),
+  //             ),
+  //             TextButton(
+  //               onPressed: () => Navigator.of(context).pop(true),
+  //               style: TextButton.styleFrom(foregroundColor: Colors.red),
+  //               child: const Text('Delete'),
+  //             ),
+  //           ],
+  //         ),
+  //   );
 
-    if (confirmed == true) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('products')
-            .doc(productId)
-            .delete();
+  //   if (confirmed == true) {
+  //     try {
+  //       await FirebaseFirestore.instance
+  //           .collection('products')
+  //           .doc(productId)
+  //           .delete();
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Product deleted successfully'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error deleting product: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-  }
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(
+  //             content: Text('Product deleted successfully'),
+  //             backgroundColor: Colors.green,
+  //           ),
+  //         );
+  //       }
+  //     } catch (e) {
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('Error deleting product: $e'),
+  //             backgroundColor: Colors.red,
+  //           ),
+  //         );
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 class _ProductCard extends StatelessWidget {
   final ProductModel product;
   final String productId;
-  final VoidCallback onDelete;
+  //final VoidCallback onDelete;
 
   const _ProductCard({
     required this.product,
     required this.productId,
-    required this.onDelete,
+    //   required this.onDelete,
   });
 
   @override
@@ -457,22 +457,28 @@ class _ProductCard extends StatelessWidget {
                   'Posted: ${_formatDate(product.createdAt)}',
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
-                Row(
-                  children: [
-                    TextButton.icon(
-                      onPressed:
-                          () => context.go('/product-details', extra: product),
-                      icon: const Icon(Icons.visibility, size: 16),
-                      label: const Text('View'),
-                    ),
-                    TextButton.icon(
-                      onPressed: onDelete,
-                      icon: const Icon(Icons.delete, size: 16),
-                      label: const Text('Delete'),
-                      style: TextButton.styleFrom(foregroundColor: Colors.red),
-                    ),
-                  ],
+                TextButton.icon(
+                  onPressed:
+                      () => context.go('/product-details', extra: product), 
+                  icon: const Icon(Icons.visibility, size: 16),
+                  label: const Text('View'),
                 ),
+                // Row(
+                //   children: [
+                //     TextButton.icon(
+                //       onPressed:
+                //           () => context.go('/product-details', extra: product),
+                //       icon: const Icon(Icons.visibility, size: 16),
+                //       label: const Text('View'),
+                //     ),
+                //     // TextButton.icon(
+                //     // //  onPressed: onDelete,
+                //     //   icon: const Icon(Icons.delete, size: 16),
+                //     //   label: const Text('Delete'),
+                //     //   style: TextButton.styleFrom(foregroundColor: Colors.red),
+                //     // ),
+                //   ],
+                // ),
               ],
             ),
           ],
@@ -489,12 +495,12 @@ class _ProductCard extends StatelessWidget {
 class _SellerProductsCard extends StatefulWidget {
   final String sellerId;
   final List<QueryDocumentSnapshot> products;
-  final Function(String) onDeleteProduct;
+  // final Function(String) onDeleteProduct;
 
   const _SellerProductsCard({
     required this.sellerId,
     required this.products,
-    required this.onDeleteProduct,
+    // required this.onDeleteProduct,
   });
 
   @override
@@ -514,19 +520,19 @@ class _SellerProductsCardState extends State<_SellerProductsCard> {
   Future<void> _loadSellerName() async {
     try {
       // Try sellers collection first
-      final sellerDoc =
-          await FirebaseFirestore.instance
-              .collection('sellers')
-              .doc(widget.sellerId)
-              .get();
+      // final sellerDoc =
+      //     await FirebaseFirestore.instance
+      //         .collection('sellers')
+      //         .doc(widget.sellerId)
+      //         .get();
 
-      if (sellerDoc.exists) {
-        final data = sellerDoc.data() as Map<String, dynamic>;
-        setState(() {
-          sellerName = data['businessName'] ?? data['name'] ?? 'Unknown Seller';
-        });
-        return;
-      }
+      // if (sellerDoc.exists) {
+      //   final data = sellerDoc.data() as Map<String, dynamic>;
+      //   setState(() {
+      //     sellerName = data['businessName'] ?? data['name'] ?? 'Unknown Seller';
+      //   });
+      //   return;
+      // }
 
       // Try users collection
       final userDoc =
@@ -590,21 +596,26 @@ class _SellerProductsCardState extends State<_SellerProductsCard> {
                 subtitle: Text(
                   '₱${product.pricePerSack.toStringAsFixed(2)} per sack',
                 ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      onPressed:
-                          () => context.go('/product-details', extra: product),
-                      icon: const Icon(Icons.visibility),
-                    ),
-                    IconButton(
-                      onPressed: () => widget.onDeleteProduct(doc.id),
-                      icon: const Icon(Icons.delete),
-                      color: Colors.red,
-                    ),
-                  ],
+                trailing: IconButton(
+                  onPressed:
+                      () => context.go('/product-details', extra: product),
+                  icon: const Icon(Icons.visibility),
                 ),
+                //  Row(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [
+                //     IconButton(
+                //       onPressed:
+                //           () => context.go('/product-details', extra: product),
+                //       icon: const Icon(Icons.visibility),
+                //     ),
+                //     // IconButton(
+                //     //   onPressed: () => widget.onDeleteProduct(doc.id),
+                //     //   icon: const Icon(Icons.delete),
+                //     //   color: Colors.red,
+                //     // ),
+                //   ],
+                // ),
               );
             }).toList(),
       ),
