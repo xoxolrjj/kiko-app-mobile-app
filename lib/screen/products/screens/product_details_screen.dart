@@ -277,8 +277,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           );
                           return;
                         }
-
-                        if (_sellerData != null) {
+                        if (authStore.currentUser?.role == UserRole.user) {
                           context.go(
                             '/checkout',
                             extra: {
@@ -287,12 +286,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               'sellerData': _sellerData!,
                             },
                           );
-                        } else {
+                        }
+                        // if (_sellerData != null) {
+                        //   context.go(
+                        //     '/checkout',
+                        //     extra: {
+                        //       'product': widget.product,
+                        //       'quantity': _quantity,
+                        //       'sellerData': _sellerData!,
+                        //     },
+                        //   );
+                        // }
+                        else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                'Please wait for seller information to load',
-                              ),
+                              content: Text('Admin cannot purchase products'),
                             ),
                           );
                         }
