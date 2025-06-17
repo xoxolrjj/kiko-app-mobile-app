@@ -66,7 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       //   MaterialPageRoute(builder: (context) => const LoginScreen()),
       // );
 
-      context.go('/login');
+      context.go('/home');
     } else {
       // Handle validation errors
       ScaffoldMessenger.of(context).showSnackBar(
