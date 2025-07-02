@@ -112,7 +112,7 @@ class DummyDataGenerator {
   }
 
   static int _generateStock() {
-    return 20 + _random.nextInt(81); // Random stock between 20 and 100
+    return 5; // All products start with 5 stock
   }
 
   static String _getRandomImage(ProductCategory category) {
@@ -125,9 +125,8 @@ class DummyDataGenerator {
       ProductCategory.rice: [500, 501, 502, 503, 504],
     };
 
-    final categoryIds = imageIds[category]!;
-    final randomId = categoryIds[_random.nextInt(categoryIds.length)];
-    return 'https://picsum.photos/400/300?random=$randomId';
+    final categoryImages = imageIds[category]!;
+    return 'https://picsum.photos/200/300?random=${categoryImages[_random.nextInt(categoryImages.length)]}';
   }
 
   static List<Map<String, dynamic>> _generateRandomProducts(int count) {
@@ -177,7 +176,10 @@ class DummyDataGenerator {
         pricePerSack: productData['price'] as double,
         stock: productData['stock'] as int,
         imagePath: (productData['images'] as List<String>).first,
-        category: productData['category'] as ProductCategory,
+        category:
+            productData['category'] is ProductCategory
+                ? productData['category'] as ProductCategory
+                : ProductCategory.vegetables, // Fallback if cast fails
         sellerId: sellerId,
         createdAt: DateTime.now(),
       );

@@ -36,6 +36,9 @@ class _CreateProductState extends State<CreateProduct> {
     super.initState();
     if (isEditing) {
       _populateFormWithExistingData();
+    } else {
+      // Set default stock to 5 for new products
+      _stockController.text = '5';
     }
   }
 
@@ -215,11 +218,16 @@ class _CreateProductState extends State<CreateProduct> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _stockController,
-                decoration: const InputDecoration(labelText: 'Stock'),
+                decoration: const InputDecoration(
+                  labelText: 'Stock',
+                  hintText: 'Default: 5 sacks',
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value?.isEmpty ?? true) return 'Please enter stock';
                   if (int.tryParse(value!) == null) return 'Invalid stock';
+                  final stock = int.parse(value!);
+                  if (stock < 0) return 'Stock cannot be negative';
                   return null;
                 },
               ),

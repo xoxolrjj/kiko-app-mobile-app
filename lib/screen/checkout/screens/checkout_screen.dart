@@ -103,6 +103,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       };
       await orderRef.set(orderData);
 
+      // CRITICAL: Decrease stock after successful order
+      try {
+        final productRef = FirebaseFirestore.instance
+            .collection('products')
+            .doc(widget.product.id);
+
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          final productDoc = await transaction.get(productRef);
+
+          if (productDoc.exists) {
+            final currentStock = productDoc.data()?['stock'] ?? 0;
+            final newStock = currentStock - widget.quantity;
+
+            // Update stock (can go to 0 or negative, but we'll handle this in UI)
+            transaction.update(productRef, {'stock': newStock});
+          }
+        });
+      } catch (stockError) {
+        print('Warning: Could not update stock: $stockError');
+        // Continue with order creation even if stock update fails
+      }
+
       // Send notification to buyer
       final notificationStore = NotificationStore();
       await notificationStore.createNotification(

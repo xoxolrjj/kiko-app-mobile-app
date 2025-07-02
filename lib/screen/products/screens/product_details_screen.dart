@@ -18,7 +18,7 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  int _quantity = 5; // Default to 5 sacks
+  int _quantity = 5; // Default to 1 sack
   Map<String, dynamic>? _sellerData;
   bool _isLoadingSeller = false;
 
@@ -224,102 +224,154 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Quantity Selection
-                  Text(
-                    'Select Number of Sacks',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
+                  // Stock Status
                   Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed:
-                            _quantity > 5
-                                ? () => setState(() => _quantity -= 1)
-                                : null,
+                      Icon(
+                        Icons.inventory_2,
+                        size: 16,
+                        color:
+                            widget.product.stock > 0
+                                ? Colors.green
+                                : Colors.red,
                       ),
+                      const SizedBox(width: 4),
                       Text(
-                        '$_quantity sacks',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () => setState(() => _quantity += 1),
+                        widget.product.stock > 0
+                            ? 'Stock: ${widget.product.stock} sacks available'
+                            : 'Out of Stock',
+                        style: TextStyle(
+                          color:
+                              widget.product.stock > 0
+                                  ? Colors.green
+                                  : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Total Price: ₱${(widget.product.pricePerSack * _quantity).toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.bold,
+                  const SizedBox(height: 16),
+
+                  // Quantity Selection (only show if stock available)
+                  if (widget.product.stock > 0) ...[
+                    Text(
+                      'Select Number of Sacks',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed:
+                              _quantity > 1
+                                  ? () => setState(() => _quantity -= 1)
+                                  : null,
+                        ),
+                        Text(
+                          '$_quantity sacks',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed:
+                              _quantity < widget.product.stock
+                                  ? () => setState(() => _quantity += 1)
+                                  : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (widget.product.stock > 0) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Total Price: ₱${(widget.product.pricePerSack * _quantity).toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 32),
 
                   // Buy Now Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        final authStore = Provider.of<AuthStore>(
-                          context,
-                          listen: false,
-                        );
-                        if (authStore.currentUser?.role == UserRole.seller) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Sellers cannot purchase products'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                        if (authStore.currentUser?.role == UserRole.user) {
-                          context.go(
-                            '/checkout',
-                            extra: {
-                              'product': widget.product,
-                              'quantity': _quantity,
-                              'sellerData': _sellerData!,
-                            },
-                          );
-                        }
-                        // if (_sellerData != null) {
-                        //   context.go(
-                        //     '/checkout',
-                        //     extra: {
-                        //       'product': widget.product,
-                        //       'quantity': _quantity,
-                        //       'sellerData': _sellerData!,
-                        //     },
-                        //   );
-                        // }
-                        else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Admin cannot purchase products'),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed:
+                          widget.product.stock > 0
+                              ? () {
+                                final authStore = Provider.of<AuthStore>(
+                                  context,
+                                  listen: false,
+                                );
+                                if (authStore.currentUser?.role ==
+                                    UserRole.seller) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Sellers cannot purchase products',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                if (authStore.currentUser?.role ==
+                                    UserRole.user) {
+                                  // Check if trying to buy more than available stock
+                                  if (_quantity > widget.product.stock) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Only ${widget.product.stock} sacks available',
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  context.go(
+                                    '/checkout',
+                                    extra: {
+                                      'product': widget.product,
+                                      'quantity': _quantity,
+                                      'sellerData': _sellerData!,
+                                    },
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Admin cannot purchase products',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                              : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Theme.of(context).primaryColor,
+                        backgroundColor:
+                            widget.product.stock > 0
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey,
                         foregroundColor: Colors.white,
                       ),
                       child: Text(
-                        Provider.of<AuthStore>(context).currentUser?.role ==
-                                UserRole.seller
-                            ? 'Sellers Cannot Purchase'
-                            : Provider.of<AuthStore>(
-                                  context,
-                                ).currentUser?.role ==
-                                UserRole.user
-                            ? 'Buy Now'
-                            : 'Admin Cannot Purchase',
+                        widget.product.stock > 0
+                            ? (Provider.of<AuthStore>(
+                                      context,
+                                    ).currentUser?.role ==
+                                    UserRole.seller
+                                ? 'Sellers Cannot Purchase'
+                                : Provider.of<AuthStore>(
+                                      context,
+                                    ).currentUser?.role ==
+                                    UserRole.user
+                                ? 'Buy Now'
+                                : 'Admin Cannot Purchase')
+                            : 'Out of Stock',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

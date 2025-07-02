@@ -266,7 +266,28 @@ final goRouter = GoRouter(
         GoRoute(
           path: '/products',
           builder: (context, state) {
-            final category = state.extra as ProductCategory?;
+            ProductCategory? category;
+            if (state.extra is ProductCategory) {
+              category = state.extra as ProductCategory;
+            } else if (state.extra is Map) {
+              // Handle case where ProductCategory gets serialized to a Map
+              final map = state.extra as Map;
+              if (map.containsKey('index') && map['index'] is int) {
+                final index = map['index'] as int;
+                if (index >= 0 && index < ProductCategory.values.length) {
+                  category = ProductCategory.values[index];
+                }
+              } else if (map.containsKey('name') && map['name'] is String) {
+                final name = map['name'] as String;
+                try {
+                  category = ProductCategory.values.firstWhere(
+                    (e) => e.name == name,
+                  );
+                } catch (e) {
+                  category = null;
+                }
+              }
+            }
             return ProductScreen(category: category);
           },
         ),

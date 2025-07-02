@@ -41,6 +41,7 @@ const _$NotificationTypeEnumMap = {
   NotificationType.orderPreparing: 'orderPreparing',
   NotificationType.orderShipped: 'orderShipped',
   NotificationType.orderDelivered: 'orderDelivered',
+  NotificationType.orderReceived: 'orderReceived',
   NotificationType.accountRestricted: 'accountRestricted',
   NotificationType.newOrder: 'newOrder',
   NotificationType.orderCancelled: 'orderCancelled',

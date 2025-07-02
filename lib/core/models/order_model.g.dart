@@ -39,6 +39,10 @@ _$OrderModelImpl _$$OrderModelImplFromJson(Map<String, dynamic> json) =>
           json['deliveredAt'] == null
               ? null
               : DateTime.parse(json['deliveredAt'] as String),
+      receivedAt:
+          json['receivedAt'] == null
+              ? null
+              : DateTime.parse(json['receivedAt'] as String),
       notes: json['notes'] as String?,
       rejectionReason: json['rejectionReason'] as String?,
     );
@@ -61,6 +65,7 @@ Map<String, dynamic> _$$OrderModelImplToJson(_$OrderModelImpl instance) =>
       'readyAt': instance.readyAt?.toIso8601String(),
       'shippedAt': instance.shippedAt?.toIso8601String(),
       'deliveredAt': instance.deliveredAt?.toIso8601String(),
+      'receivedAt': instance.receivedAt?.toIso8601String(),
       'notes': instance.notes,
       'rejectionReason': instance.rejectionReason,
     };

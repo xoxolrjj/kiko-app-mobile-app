@@ -325,10 +325,19 @@ class _ProductCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Stock: ${product.stock}',
+                          product.stock > 0
+                              ? 'Stock: ${product.stock}'
+                              : 'Out of Stock',
                           style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color:
+                                product.stock > 0
+                                    ? Colors.grey.shade600
+                                    : Colors.red,
                             fontSize: 14,
+                            fontWeight:
+                                product.stock > 0
+                                    ? FontWeight.normal
+                                    : FontWeight.bold,
                           ),
                         ),
                         const SizedBox(width: 16),

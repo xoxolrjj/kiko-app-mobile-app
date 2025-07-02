@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kiko_app_mobile_app/core/models/order_model.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:kiko_app_mobile_app/core/services/notification_service.dart';
@@ -395,6 +396,7 @@ class _OrderCard extends StatelessWidget {
     }
 
     final createdAt = parseDateTime(orderData['createdAt']);
+    final receivedAt = parseDateTime(orderData['receivedAt']);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -479,6 +481,34 @@ class _OrderCard extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 16),
+
+                // Order received status
+                if (receivedAt != null) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.green, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Order received by customer on ${_formatDate(receivedAt)}',
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
                 // Action Buttons
                 _buildActionButtons(context),
@@ -718,24 +748,49 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 16, color: Colors.grey.shade600),
           const SizedBox(width: 8),
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w500)),
+          Expanded(
+            child: Text(value, style: TextStyle(color: Colors.grey.shade700)),
           ),
-          Expanded(child: Text(value)),
         ],
       ),
     );
   }
+}
+
+// Helper class to create a mock DocumentSnapshot for OrderModel parsing
+class MockDocumentSnapshot implements DocumentSnapshot<Map<String, dynamic>> {
+  final String _id;
+  final Map<String, dynamic> _data;
+
+  MockDocumentSnapshot(this._id, this._data);
+
+  @override
+  String get id => _id;
+
+  @override
+  Map<String, dynamic>? data() => _data;
+
+  @override
+  bool get exists => true;
+
+  // Implement other required methods with minimal functionality
+  @override
+  DocumentReference<Map<String, dynamic>> get reference =>
+      throw UnimplementedError();
+
+  @override
+  SnapshotMetadata get metadata => throw UnimplementedError();
+
+  @override
+  dynamic operator [](Object field) => _data[field];
+
+  @override
+  dynamic get(Object field) => _data[field];
 }

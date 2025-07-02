@@ -159,6 +159,30 @@ mixin _$ProductStore on _ProductStore, Store {
     return _$deleteProductAsyncAction.run(() => super.deleteProduct(productId));
   }
 
+  late final _$decreaseStockAsyncAction = AsyncAction(
+    '_ProductStore.decreaseStock',
+    context: context,
+  );
+
+  @override
+  Future<bool> decreaseStock(String productId, int quantity) {
+    return _$decreaseStockAsyncAction.run(
+      () => super.decreaseStock(productId, quantity),
+    );
+  }
+
+  late final _$increaseStockAsyncAction = AsyncAction(
+    '_ProductStore.increaseStock',
+    context: context,
+  );
+
+  @override
+  Future<void> increaseStock(String productId, int quantity) {
+    return _$increaseStockAsyncAction.run(
+      () => super.increaseStock(productId, quantity),
+    );
+  }
+
   late final _$_ProductStoreActionController = ActionController(
     name: '_ProductStore',
     context: context,

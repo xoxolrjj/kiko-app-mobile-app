@@ -34,6 +34,7 @@ class OrderModel with _$OrderModel {
     DateTime? readyAt,
     DateTime? shippedAt,
     DateTime? deliveredAt,
+    DateTime? receivedAt,
     String? notes,
     String? rejectionReason,
   }) = _OrderModel;
@@ -99,6 +100,8 @@ class OrderModel with _$OrderModel {
           data['deliveredAt'] != null
               ? parseDateTime(data['deliveredAt'])
               : null,
+      receivedAt:
+          data['receivedAt'] != null ? parseDateTime(data['receivedAt']) : null,
       notes: cast<String>(data['notes']),
       rejectionReason: cast<String>(data['rejectionReason']),
     );

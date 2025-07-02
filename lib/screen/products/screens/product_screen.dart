@@ -272,9 +272,38 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      product.category.name.toUpperCase(),
-                      style: Theme.of(context).textTheme.bodySmall,
+                    Row(
+                      children: [
+                        Text(
+                          product.category.name.toUpperCase(),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                product.stock > 0
+                                    ? Colors.green.withOpacity(0.1)
+                                    : Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            product.stock > 0
+                                ? '${product.stock} left'
+                                : 'Out of Stock',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color:
+                                  product.stock > 0 ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

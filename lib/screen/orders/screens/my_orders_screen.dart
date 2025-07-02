@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kiko_app_mobile_app/core/models/order_model.dart';
+import 'package:kiko_app_mobile_app/core/services/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
 
@@ -283,8 +283,9 @@ class _OrderCard extends StatelessWidget {
                   ),
                 ),
 
-                if (_canCancelOrder()) ...[
-                  const SizedBox(height: 16),
+                // Action buttons based on order status
+                const SizedBox(height: 16),
+                if (_canCancelOrder())
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -302,7 +303,26 @@ class _OrderCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
+
+                if (_canConfirmReceived())
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => _confirmOrderReceived(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        'Confirm Order Received',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -407,6 +427,13 @@ class _OrderCard extends StatelessWidget {
             date: order.deliveredAt!,
             isCompleted: true,
           ),
+        if (order.receivedAt != null)
+          _TimelineItem(
+            icon: Icons.check_circle_outline,
+            title: 'Order Received',
+            date: order.receivedAt!,
+            isCompleted: true,
+          ),
       ],
     );
   }
@@ -415,6 +442,83 @@ class _OrderCard extends StatelessWidget {
     return order.status == OrderStatus.pending ||
         order.status == OrderStatus.accepted ||
         order.status == OrderStatus.preparing;
+  }
+
+  bool _canConfirmReceived() {
+    return order.status == OrderStatus.delivered && order.receivedAt == null;
+  }
+
+  Future<void> _confirmOrderReceived(BuildContext context) async {
+    // Show confirmation dialog first
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Order Received'),
+          content: Text(
+            'Are you sure you want to confirm that you have received order #${order.id.substring(0, 8)}?\n\nThis action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              child: const Text(
+                'Confirm Received',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      // Update order with receivedAt timestamp
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(order.id)
+          .update({
+            'receivedAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+
+      // Send notifications to seller and admin
+      final notificationService = NotificationService();
+      await notificationService.sendOrderStatusNotifications(
+        orderId: order.id,
+        newStatus: 'received',
+        orderData: {
+          'buyerId': order.buyerId,
+          'buyerName': order.buyerName,
+          'sellerId': order.sellerId,
+          'sellerName': order.sellerName,
+        },
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order receipt confirmed successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error confirming order receipt: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Color _getStatusColor(OrderStatus status) {

@@ -12,6 +12,7 @@ enum NotificationType {
   orderPreparing,
   orderShipped,
   orderDelivered,
+  orderReceived,
   accountRestricted,
   newOrder,
   orderCancelled,

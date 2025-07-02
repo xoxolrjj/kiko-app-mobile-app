@@ -229,6 +229,18 @@ mixin _$AuthStore on _AuthStore, Store {
     );
   }
 
+  late final _$updateEmailAsyncAction = AsyncAction(
+    '_AuthStore.updateEmail',
+    context: context,
+  );
+
+  @override
+  Future<void> updateEmail(String currentPassword, String newEmail) {
+    return _$updateEmailAsyncAction.run(
+      () => super.updateEmail(currentPassword, newEmail),
+    );
+  }
+
   late final _$resetPasswordAsyncAction = AsyncAction(
     '_AuthStore.resetPassword',
     context: context,
@@ -289,6 +301,36 @@ mixin _$AuthStore on _AuthStore, Store {
   @override
   Future<void> requestSellerRole() {
     return _$requestSellerRoleAsyncAction.run(() => super.requestSellerRole());
+  }
+
+  late final _$debugUserStateAsyncAction = AsyncAction(
+    '_AuthStore.debugUserState',
+    context: context,
+  );
+
+  @override
+  Future<void> debugUserState() {
+    return _$debugUserStateAsyncAction.run(() => super.debugUserState());
+  }
+
+  late final _$updateEmailAndPasswordAsyncAction = AsyncAction(
+    '_AuthStore.updateEmailAndPassword',
+    context: context,
+  );
+
+  @override
+  Future<void> updateEmailAndPassword({
+    required String currentPassword,
+    String? newEmail,
+    String? newPassword,
+  }) {
+    return _$updateEmailAndPasswordAsyncAction.run(
+      () => super.updateEmailAndPassword(
+        currentPassword: currentPassword,
+        newEmail: newEmail,
+        newPassword: newPassword,
+      ),
+    );
   }
 
   late final _$_AuthStoreActionController = ActionController(

@@ -60,6 +60,15 @@ class NotificationService {
             sellerName,
           );
           break;
+        case 'received':
+          await _sendReceivedNotifications(
+            orderId,
+            buyerId,
+            sellerId,
+            buyerName,
+            sellerName,
+          );
+          break;
       }
     } catch (e) {
       print('Error sending order status notifications: $e');
@@ -235,6 +244,34 @@ class NotificationService {
       message:
           'Order #${orderId.substring(0, 8)} from $sellerName to $buyerName has been cancelled.',
       type: NotificationType.orderCancelled,
+      orderId: orderId,
+    );
+  }
+
+  /// Send notifications when buyer confirms order received
+  Future<void> _sendReceivedNotifications(
+    String orderId,
+    String buyerId,
+    String sellerId,
+    String buyerName,
+    String sellerName,
+  ) async {
+    // Notify seller
+    await _notificationStore.createNotification(
+      userId: sellerId,
+      title: 'Order Received Confirmation',
+      message:
+          '$buyerName has confirmed receipt of order #${orderId.substring(0, 8)}. Great job!',
+      type: NotificationType.orderReceived,
+      orderId: orderId,
+    );
+
+    // Notify all admins
+    await _sendNotificationToAllAdmins(
+      title: 'Order Completed',
+      message:
+          'Order #${orderId.substring(0, 8)} from $sellerName to $buyerName has been completed successfully.',
+      type: NotificationType.orderReceived,
       orderId: orderId,
     );
   }
