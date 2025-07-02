@@ -2,18 +2,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
- import 'package:kiko_app_mobile_app/firebase_options.dart';
+import 'package:kiko_app_mobile_app/firebase_options.dart';
 import 'package:kiko_app_mobile_app/router.dart';
 import 'package:kiko_app_mobile_app/core/stores/product_store.dart';
 import 'package:kiko_app_mobile_app/core/stores/seller_store.dart';
 import 'package:provider/provider.dart';
 import 'dependency/dependency_manager.dart';
- 
 
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
 
+    // Initialize Firebase once
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
@@ -30,9 +30,6 @@ void main() async {
         sellerStore: sl<SellerStore>(),
       ),
     );
-
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
   } catch (e) {
     debugPrint('Error initializing app: $e');
   }

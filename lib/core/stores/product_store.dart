@@ -260,4 +260,78 @@ abstract class _ProductStore with Store {
       rethrow;
     }
   }
+
+  @action
+  Future<bool> decreaseStock(String productId, int quantity) async {
+    try {
+      final docRef = _firestore.collection('products').doc(productId);
+
+      // Use a transaction to ensure stock doesn't go below 0
+      final result = await _firestore.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef);
+
+        if (!snapshot.exists) {
+          throw Exception('Product not found');
+        }
+
+        final currentStock = snapshot.data()?['stock'] ?? 0;
+
+        if (currentStock < quantity) {
+          return false; // Not enough stock
+        }
+
+        final newStock = currentStock - quantity;
+        transaction.update(docRef, {'stock': newStock});
+
+        return true; // Stock decreased successfully
+      });
+
+      if (result) {
+        // Update local products list
+        final index = products.indexWhere((p) => p.id == productId);
+        if (index != -1) {
+          final updatedProduct = products[index].copyWith(
+            stock: products[index].stock - quantity,
+          );
+          products[index] = updatedProduct;
+        }
+      }
+
+      return result;
+    } catch (e) {
+      debugPrint('Error decreasing stock: $e');
+      rethrow;
+    }
+  }
+
+  @action
+  Future<void> increaseStock(String productId, int quantity) async {
+    try {
+      final docRef = _firestore.collection('products').doc(productId);
+
+      await _firestore.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef);
+
+        if (!snapshot.exists) {
+          throw Exception('Product not found');
+        }
+
+        final currentStock = snapshot.data()?['stock'] ?? 0;
+        final newStock = currentStock + quantity;
+        transaction.update(docRef, {'stock': newStock});
+      });
+
+      // Update local products list
+      final index = products.indexWhere((p) => p.id == productId);
+      if (index != -1) {
+        final updatedProduct = products[index].copyWith(
+          stock: products[index].stock + quantity,
+        );
+        products[index] = updatedProduct;
+      }
+    } catch (e) {
+      debugPrint('Error increasing stock: $e');
+      rethrow;
+    }
+  }
 }

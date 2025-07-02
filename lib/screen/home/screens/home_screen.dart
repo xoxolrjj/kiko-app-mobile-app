@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         elevation: 0,
         title: Text(
-          'Welcome, ${authStore.currentUser?.name}',
+          'Welcome ${authStore.currentUser?.name}',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).primaryColor,
@@ -97,30 +97,28 @@ class _HomeScreenState extends State<HomeScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Welcome to KikoApp',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.headlineMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Fresh groceries delivered to\nyour doorstep',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // child: Padding(
+                      //   padding: const EdgeInsets.all(16.0),
+                      //   child: Stack(
+                      //     // crossAxisAlignment: CrossAxisAlignment.start,
+                      //     // mainAxisAlignment: MainAxisAlignment.end,
+                      //     children: [
+                      //       Positioned(
+                      //         top: -2,
+                      //         left: 0,
+                      //         child: Text(
+                      //           'Welcome to KikoApp',
+                      //           style: Theme.of(
+                      //             context,
+                      //           ).textTheme.headlineMedium?.copyWith(
+                      //             color: Colors.white,
+                      //             fontWeight: FontWeight.bold,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     );
                   },
                 ),

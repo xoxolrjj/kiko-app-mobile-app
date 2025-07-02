@@ -1,22 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kiko_app_mobile_app/core/commons/utils.dart';
 
-enum PhilippineIDType {
-  psaBirthCertificate,
-  passport,
-  driversLicense,
-  votersId,
-  sssId,
-  tinId,
-  philHealthId,
-  prcId,
-  seniorCitizenId,
-  pwdId,
-  postalId,
-  barangayId,
-  nationalID,
-  farmerID,
-}
+enum PhilippineIDType { farmerID }
 
 enum VerificationStatus { pending, approved, rejected }
 
@@ -79,7 +64,7 @@ class SellerVerificationRequest {
       shopName: '',
       contactNumber: '',
       shopLocation: '',
-      idType: PhilippineIDType.psaBirthCertificate,
+      idType: PhilippineIDType.farmerID,
       idNumber: '',
       idImageUrl: '',
       faceVerificationUrl: '',
@@ -109,7 +94,7 @@ class SellerVerificationRequest {
       shopLocation: cast<String>(data['shopLocation']) ?? '',
       idType: PhilippineIDType.values.firstWhere(
         (e) => e.name == cast<String>(data['idType']),
-        orElse: () => PhilippineIDType.psaBirthCertificate,
+        orElse: () => PhilippineIDType.farmerID,
       ),
       idNumber: cast<String>(data['idNumber']) ?? '',
       idImageUrl: cast<String>(data['idImageUrl']) ?? '',
@@ -140,7 +125,7 @@ class SellerVerificationRequest {
       shopLocation: cast<String>(data['shopLocation']) ?? '',
       idType: PhilippineIDType.values.firstWhere(
         (e) => e.name == cast<String>(data['idType']),
-        orElse: () => PhilippineIDType.psaBirthCertificate,
+        orElse: () => PhilippineIDType.farmerID,
       ),
       idNumber: cast<String>(data['idNumber']) ?? '',
       idImageUrl: cast<String>(data['idImageUrl']) ?? '',
@@ -226,32 +211,32 @@ class SellerVerificationRequest {
 
   String get idTypeDisplayName {
     switch (idType) {
-      case PhilippineIDType.psaBirthCertificate:
-        return 'PSA Birth Certificate';
-      case PhilippineIDType.passport:
-        return 'Philippine Passport';
-      case PhilippineIDType.driversLicense:
-        return "Driver's License";
-      case PhilippineIDType.votersId:
-        return "Voter's ID";
-      case PhilippineIDType.sssId:
-        return 'SSS ID';
-      case PhilippineIDType.tinId:
-        return 'TIN ID';
-      case PhilippineIDType.philHealthId:
-        return 'PhilHealth ID';
-      case PhilippineIDType.prcId:
-        return 'PRC ID';
-      case PhilippineIDType.seniorCitizenId:
-        return 'Senior Citizen ID';
-      case PhilippineIDType.pwdId:
-        return 'PWD ID';
-      case PhilippineIDType.postalId:
-        return 'Postal ID';
-      case PhilippineIDType.barangayId:
-        return 'Barangay ID';
-      case PhilippineIDType.nationalID:
-        return 'National ID';
+      // case PhilippineIDType.psaBirthCertificate:
+      //   return 'PSA Birth Certificate';
+      // case PhilippineIDType.passport:
+      //   return 'Philippine Passport';
+      // case PhilippineIDType.driversLicense:
+      //   return "Driver's License";
+      // case PhilippineIDType.votersId:
+      //   return "Voter's ID";
+      // case PhilippineIDType.sssId:
+      //   return 'SSS ID';
+      // case PhilippineIDType.tinId:
+      //   return 'TIN ID';
+      // case PhilippineIDType.philHealthId:
+      //   return 'PhilHealth ID';
+      // case PhilippineIDType.prcId:
+      //   return 'PRC ID';
+      // case PhilippineIDType.seniorCitizenId:
+      //   return 'Senior Citizen ID';
+      // case PhilippineIDType.pwdId:
+      //   return 'PWD ID';
+      // case PhilippineIDType.postalId:
+      //   return 'Postal ID';
+      // case PhilippineIDType.barangayId:
+      //   return 'Barangay ID';
+      // case PhilippineIDType.nationalID:
+      //   return 'National ID';
       case PhilippineIDType.farmerID:
         return 'Farmer ID';
     }

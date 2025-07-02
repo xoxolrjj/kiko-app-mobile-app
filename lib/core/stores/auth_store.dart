@@ -323,51 +323,246 @@ abstract class _AuthStore with Store {
       isLoading = true;
       errorMessage = null;
 
+      // Validate inputs
+      if (currentPassword.trim().isEmpty) {
+        errorMessage = 'Current password is required';
+        return;
+      }
+
+      if (newPassword.trim().isEmpty) {
+        errorMessage = 'New password is required';
+        return;
+      }
+
       // Validate new password
-      final passwordError = _validatePassword(newPassword);
+      final passwordError = _validatePassword(newPassword.trim());
       if (passwordError != null) {
         errorMessage = passwordError;
+        return;
+      }
+
+      // Check if passwords are different
+      if (currentPassword.trim() == newPassword.trim()) {
+        errorMessage = 'New password must be different from current password';
         return;
       }
 
       // Reauthenticate user
       final user = _auth.currentUser;
       if (user == null) {
-        errorMessage = 'User not found';
+        errorMessage = 'User session expired. Please sign in again';
         return;
       }
 
+      debugPrint('Attempting to reauthenticate user for password update');
+
       // Get credentials for reauthentication
       final credential = EmailAuthProvider.credential(
-        email: currentUser!.email,
-        password: currentPassword,
+        email: currentUser!.email.trim(),
+        password: currentPassword.trim(),
       );
 
       // Reauthenticate
       await user.reauthenticateWithCredential(credential);
+      debugPrint('Reauthentication successful');
 
       // Update password
-      await user.updatePassword(newPassword);
-
+      await user.updatePassword(newPassword.trim());
       debugPrint('Password updated successfully');
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'wrong-password':
-          errorMessage = 'Current password is incorrect';
+        case 'invalid-credential':
+          errorMessage =
+              'Current password is incorrect. Please check your password and try again.';
           break;
         case 'requires-recent-login':
-          errorMessage = 'Please sign in again to update your password';
+          errorMessage =
+              'Please sign out and sign in again to update your password';
           break;
         case 'weak-password':
           errorMessage = 'The new password is too weak';
           break;
+        case 'user-mismatch':
+          errorMessage = 'Authentication error. Please try signing in again.';
+          break;
+        case 'network-request-failed':
+          errorMessage =
+              'Network error. Please check your connection and try again.';
+          break;
         default:
-          errorMessage = 'Failed to update password. Please try again';
+          errorMessage = 'Failed to update password: ${e.message ?? e.code}';
       }
-      debugPrint('Firebase Auth Error: ${e.code}');
+      debugPrint('Firebase Auth Error: ${e.code} - ${e.message}');
     } catch (e) {
       errorMessage = 'An unexpected error occurred. Please try again';
       debugPrint('Error updating password: $e');
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<void> updateEmail(String currentPassword, String newEmail) async {
+    if (currentUser == null) {
+      errorMessage = 'You must be logged in to update your email';
+      return;
+    }
+
+    try {
+      isLoading = true;
+      errorMessage = null;
+
+      // Validate inputs
+      if (currentPassword.trim().isEmpty) {
+        errorMessage = 'Current password is required';
+        return;
+      }
+
+      if (newEmail.trim().isEmpty) {
+        errorMessage = 'New email is required';
+        return;
+      }
+
+      // Validate email format
+      if (!RegExp(
+        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+      ).hasMatch(newEmail.trim())) {
+        errorMessage = 'Please enter a valid email address';
+        return;
+      }
+
+      // Check if email is actually different
+      if (newEmail.trim().toLowerCase() ==
+          currentUser!.email.trim().toLowerCase()) {
+        errorMessage = 'New email must be different from current email';
+        return;
+      }
+
+      // Reauthenticate user
+      final user = _auth.currentUser;
+      if (user == null) {
+        errorMessage = 'User session expired. Please sign in again';
+        return;
+      }
+
+      // Debug user state before attempting email update
+      await debugUserState();
+
+      debugPrint('Attempting to reauthenticate user: ${currentUser!.email}');
+
+      // Get credentials for reauthentication - ensure we use exact current email
+      final credential = EmailAuthProvider.credential(
+        email: currentUser!.email.trim(),
+        password: currentPassword.trim(),
+      );
+
+      // Reauthenticate first
+      await user.reauthenticateWithCredential(credential);
+      debugPrint('Reauthentication successful');
+
+      try {
+        // Update email in Firebase Auth
+        debugPrint('Starting Firebase Auth email update...');
+        await user.updateEmail(newEmail.trim());
+        debugPrint('Firebase Auth email updated successfully');
+      } catch (emailUpdateError) {
+        debugPrint('Firebase Auth email update failed: $emailUpdateError');
+        if (emailUpdateError is FirebaseAuthException) {
+          debugPrint(
+            'Firebase Auth email update error code: ${emailUpdateError.code}',
+          );
+          debugPrint(
+            'Firebase Auth email update error message: ${emailUpdateError.message}',
+          );
+        }
+        rethrow; // Re-throw to be caught by outer catch block
+      }
+
+      try {
+        // Update email in Firestore
+        debugPrint('Starting Firestore user email update...');
+        await _firestore.collection('users').doc(currentUser!.id).update({
+          'email': newEmail.trim(),
+        });
+        debugPrint('Firestore user email updated successfully');
+      } catch (firestoreError) {
+        debugPrint('Firestore user email update failed: $firestoreError');
+        // Continue even if Firestore update fails, as Firebase Auth was successful
+      }
+
+      try {
+        // If user is also a seller, update seller collection
+        if (currentUser!.role == UserRole.seller) {
+          debugPrint('Starting Firestore seller email update...');
+          await _firestore.collection('sellers').doc(currentUser!.id).update({
+            'email': newEmail.trim(),
+          });
+          debugPrint('Firestore seller email updated successfully');
+        }
+      } catch (sellerUpdateError) {
+        debugPrint('Firestore seller email update failed: $sellerUpdateError');
+        // Continue even if seller update fails
+      }
+
+      try {
+        // Refresh user data
+        debugPrint('Refreshing user data...');
+        await getUserData(currentUser!.id);
+        debugPrint('User data refreshed successfully');
+      } catch (refreshError) {
+        debugPrint('User data refresh failed: $refreshError');
+        // Continue even if refresh fails
+      }
+
+      debugPrint('Email update process completed');
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'wrong-password':
+        case 'invalid-credential':
+          errorMessage =
+              'Current password is incorrect. Please check your password and try again.';
+          break;
+        case 'email-already-in-use':
+          errorMessage = 'This email is already in use by another account';
+          break;
+        case 'invalid-email':
+          errorMessage = 'The email address is invalid';
+          break;
+        case 'requires-recent-login':
+          errorMessage =
+              'Please sign out and sign in again to update your email';
+          break;
+        case 'user-mismatch':
+          errorMessage = 'Authentication error. Please try signing in again.';
+          break;
+        case 'network-request-failed':
+          errorMessage =
+              'Network error. Please check your connection and try again.';
+          break;
+        case 'operation-not-allowed':
+          errorMessage =
+              'Email updates are not allowed. Please contact support.';
+          break;
+        case 'too-many-requests':
+          errorMessage =
+              'Too many requests. Please wait a moment and try again.';
+          break;
+        case 'user-disabled':
+          errorMessage =
+              'This account has been disabled. Please contact support.';
+          break;
+        case 'invalid-action-code':
+          errorMessage =
+              'Email verification required. Please check your email.';
+          break;
+        default:
+          errorMessage = 'Failed to update email: ${e.message ?? e.code}';
+      }
+      debugPrint('Firebase Auth Error: ${e.code} - ${e.message}');
+    } catch (e) {
+      errorMessage = 'An unexpected error occurred. Please try again';
+      debugPrint('Error updating email: $e');
     } finally {
       isLoading = false;
     }
@@ -585,5 +780,80 @@ abstract class _AuthStore with Store {
   @action
   void clearError() {
     errorMessage = null;
+  }
+
+  // Debug method to check user state before email update
+  @action
+  Future<void> debugUserState() async {
+    debugPrint('=== DEBUG USER STATE ===');
+    debugPrint('Current Firebase User: ${_auth.currentUser?.uid}');
+    debugPrint('Current Firebase User Email: ${_auth.currentUser?.email}');
+    debugPrint(
+      'Current Firebase User Verified: ${_auth.currentUser?.emailVerified}',
+    );
+    debugPrint('Current Store User: ${currentUser?.id}');
+    debugPrint('Current Store User Email: ${currentUser?.email}');
+    debugPrint('Current Store User Role: ${currentUser?.role}');
+    debugPrint('=========================');
+  }
+
+  // Combined update method to handle email and password changes properly
+  @action
+  Future<void> updateEmailAndPassword({
+    required String currentPassword,
+    String? newEmail,
+    String? newPassword,
+  }) async {
+    if (currentUser == null) {
+      errorMessage = 'You must be logged in to update your profile';
+      return;
+    }
+
+    try {
+      isLoading = true;
+      errorMessage = null;
+
+      // Validate inputs
+      if (currentPassword.trim().isEmpty) {
+        errorMessage = 'Current password is required';
+        return;
+      }
+
+      debugPrint('Starting combined email/password update...');
+      await debugUserState();
+
+      final user = _auth.currentUser;
+      if (user == null) {
+        errorMessage = 'User session expired. Please sign in again';
+        return;
+      }
+
+      // Update email first if provided
+      if (newEmail != null && newEmail.trim().isNotEmpty) {
+        if (newEmail.trim().toLowerCase() !=
+            currentUser!.email.trim().toLowerCase()) {
+          debugPrint('Updating email first...');
+          await updateEmail(currentPassword, newEmail);
+          if (errorMessage != null) return;
+
+          // Small delay to ensure Firebase processes the email change
+          await Future.delayed(const Duration(milliseconds: 500));
+        }
+      }
+
+      // Update password second if provided
+      if (newPassword != null && newPassword.trim().isNotEmpty) {
+        debugPrint('Updating password second...');
+        await updatePassword(currentPassword, newPassword);
+        if (errorMessage != null) return;
+      }
+
+      debugPrint('Combined update completed successfully');
+    } catch (e) {
+      errorMessage = 'Failed to update profile. Please try again.';
+      debugPrint('Error in combined update: $e');
+    } finally {
+      isLoading = false;
+    }
   }
 }

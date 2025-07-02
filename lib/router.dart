@@ -13,6 +13,7 @@ import 'package:kiko_app_mobile_app/screen/products/screens/product_screen.dart'
 import 'package:kiko_app_mobile_app/screen/messaging/screens/message_screen.dart';
 import 'package:kiko_app_mobile_app/screen/products/widgets/create_product.dart';
 import 'package:kiko_app_mobile_app/screen/profile/screens/profile_screen.dart';
+import 'package:kiko_app_mobile_app/screen/profile/screens/edit_profile_screen.dart';
 import 'package:kiko_app_mobile_app/screen/seller/screens/become_a_seller.dart';
 import 'package:kiko_app_mobile_app/screen/seller/screens/seller_products_screen.dart';
 import 'package:kiko_app_mobile_app/screen/seller/screens/seller_orders_screen.dart';
@@ -128,6 +129,10 @@ final goRouter = GoRouter(
       },
     ),
 
+    GoRoute(
+      path: '/edit-profile',
+      builder: (context, state) => const EditProfileScreen(),
+    ),
     GoRoute(
       path: '/create-product',
       builder: (context, state) => const CreateProduct(),

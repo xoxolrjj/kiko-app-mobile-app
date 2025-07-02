@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kiko_app_mobile_app/screen/profile/screens/edit_profile_screen.dart';
 import 'package:kiko_app_mobile_app/screen/widgets/kiko_images.dart';
 import 'package:provider/provider.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
@@ -482,6 +483,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         // ]).)
         // ],
+        _ActionCard(
+          title: 'Edit Profile',
+          subtitle: 'Update your personal information',
+          icon: Icons.edit,
+          color: Colors.purple,
+          onTap: () => context.go('/edit-profile'),
+        ),
       ],
     );
   }

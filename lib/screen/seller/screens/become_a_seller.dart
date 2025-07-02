@@ -34,7 +34,7 @@ class _BecomeASellerState extends State<BecomeASeller> {
   final _shopLocationController = TextEditingController();
 
   // ID Verification
-  PhilippineIDType _selectedIdType = PhilippineIDType.psaBirthCertificate;
+  PhilippineIDType _selectedIdType = PhilippineIDType.farmerID;
   final _idNumberController = TextEditingController();
   String? _idImagePath;
 
@@ -862,32 +862,32 @@ class _BecomeASellerState extends State<BecomeASeller> {
 
   String _getIdTypeDisplayName(PhilippineIDType type) {
     switch (type) {
-      case PhilippineIDType.psaBirthCertificate:
-        return 'PSA Birth Certificate';
-      case PhilippineIDType.passport:
-        return 'Philippine Passport';
-      case PhilippineIDType.driversLicense:
-        return "Driver's License";
-      case PhilippineIDType.votersId:
-        return "Voter's ID";
-      case PhilippineIDType.sssId:
-        return 'SSS ID';
-      case PhilippineIDType.tinId:
-        return 'TIN ID';
-      case PhilippineIDType.philHealthId:
-        return 'PhilHealth ID';
-      case PhilippineIDType.prcId:
-        return 'PRC ID';
-      case PhilippineIDType.seniorCitizenId:
-        return 'Senior Citizen ID';
-      case PhilippineIDType.pwdId:
-        return 'PWD ID';
-      case PhilippineIDType.postalId:
-        return 'Postal ID';
-      case PhilippineIDType.barangayId:
-        return 'Barangay ID';
-      case PhilippineIDType.nationalID:
-        return 'National ID';
+      // case PhilippineIDType.psaBirthCertificate:
+      //   return 'PSA Birth Certificate';
+      // case PhilippineIDType.passport:
+      //   return 'Philippine Passport';
+      // case PhilippineIDType.driversLicense:
+      //   return "Driver's License";
+      // case PhilippineIDType.votersId:
+      //   return "Voter's ID";
+      // case PhilippineIDType.sssId:
+      //   return 'SSS ID';
+      // case PhilippineIDType.tinId:
+      //   return 'TIN ID';
+      // case PhilippineIDType.philHealthId:
+      //   return 'PhilHealth ID';
+      // case PhilippineIDType.prcId:
+      //   return 'PRC ID';
+      // case PhilippineIDType.seniorCitizenId:
+      //   return 'Senior Citizen ID';
+      // case PhilippineIDType.pwdId:
+      //   return 'PWD ID';
+      // case PhilippineIDType.postalId:
+      //   return 'Postal ID';
+      // case PhilippineIDType.barangayId:
+      //   return 'Barangay ID';
+      // case PhilippineIDType.nationalID:
+      //   return 'National ID';
       case PhilippineIDType.farmerID:
         return 'Farmer ID';
     }

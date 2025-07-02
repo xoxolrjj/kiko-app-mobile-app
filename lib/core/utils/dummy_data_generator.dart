@@ -116,31 +116,18 @@ class DummyDataGenerator {
   }
 
   static String _getRandomImage(ProductCategory category) {
-    final imageUrls = {
-      ProductCategory.vegetables: [
-        'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37',
-        'https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f',
-        'https://images.unsplash.com/photo-1546094094091-8c6b44943661',
-      ],
-      ProductCategory.seafoods: [
-        'https://images.unsplash.com/photo-1544943910-4c1dc44aab44',
-        'https://images.unsplash.com/photo-1565680018434-b583b12be0d3',
-        'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2',
-      ],
-      ProductCategory.fruits: [
-        'https://images.unsplash.com/photo-1553279768-865429fa0078',
-        'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e',
-        'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb',
-      ],
-      ProductCategory.rice: [
-        'https://images.unsplash.com/photo-1586201375761-83865001e31c',
-        'https://images.unsplash.com/photo-1595661677316-65c961c7b18e',
-        'https://images.unsplash.com/photo-1586201375761-83865001e31c',
-      ],
+    // Using picsum.photos for reliable placeholder images
+    // Different image IDs for each category to provide variety
+    final imageIds = {
+      ProductCategory.vegetables: [200, 201, 202, 203, 204],
+      ProductCategory.seafoods: [300, 301, 302, 303, 304],
+      ProductCategory.fruits: [400, 401, 402, 403, 404],
+      ProductCategory.rice: [500, 501, 502, 503, 504],
     };
 
-    final categoryImages = imageUrls[category]!;
-    return categoryImages[_random.nextInt(categoryImages.length)];
+    final categoryIds = imageIds[category]!;
+    final randomId = categoryIds[_random.nextInt(categoryIds.length)];
+    return 'https://picsum.photos/400/300?random=$randomId';
   }
 
   static List<Map<String, dynamic>> _generateRandomProducts(int count) {

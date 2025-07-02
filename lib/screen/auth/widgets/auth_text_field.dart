@@ -7,6 +7,7 @@ class AuthTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final IconData? prefixIcon;
   final int? maxLines;
   final int? minLines;
 
@@ -18,6 +19,7 @@ class AuthTextField extends StatelessWidget {
     this.keyboardType,
     this.validator,
     this.suffixIcon,
+    this.prefixIcon,
     this.maxLines = 1,
     this.minLines,
   });
@@ -29,6 +31,7 @@ class AuthTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon,
       ),
       obscureText: obscureText,
@@ -38,4 +41,4 @@ class AuthTextField extends StatelessWidget {
       minLines: minLines,
     );
   }
-} 
+}

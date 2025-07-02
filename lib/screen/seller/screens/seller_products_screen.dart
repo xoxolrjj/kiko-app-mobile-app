@@ -24,7 +24,7 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
   void initState() {
     super.initState();
     _productStore = Provider.of<ProductStore>(context, listen: false);
-    _loadSellerProducts();  
+    _loadSellerProducts();
   }
 
   void _loadSellerProducts() {
@@ -69,11 +69,12 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
         ),
         title: const Text('My Products'),
         actions: [
-          IconButton(
-            onPressed: () => _showCreateProductDialog(),
-            icon: const Icon(Icons.add),
-            tooltip: 'Add Product',
-          ),
+          if (_productStore.products.isNotEmpty)
+            IconButton(
+              onPressed: () => _showCreateProductDialog(),
+              icon: const Icon(Icons.add),
+              tooltip: 'Add Product',
+            ),
         ],
       ),
       body: Observer(
@@ -163,11 +164,11 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateProductDialog,
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _showCreateProductDialog,
+      //   backgroundColor: Colors.green,
+      //   child: const Icon(Icons.add, color: Colors.white),
+      // ),
     );
   }
 
