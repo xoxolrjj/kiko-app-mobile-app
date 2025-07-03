@@ -159,6 +159,22 @@ class _CreateProductState extends State<CreateProduct> {
 
   @override
   Widget build(BuildContext context) {
+    if (!isEditing) {
+      final authStore = Provider.of<AuthStore>(context, listen: false);
+      if (authStore.currentUser?.isRestricted == true) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/seller/products');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account restricted: Cannot create new products'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

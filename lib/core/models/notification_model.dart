@@ -16,6 +16,8 @@ enum NotificationType {
   accountRestricted,
   newOrder,
   orderCancelled,
+  accountCreated,
+  sellerApology,
 }
 
 @freezed

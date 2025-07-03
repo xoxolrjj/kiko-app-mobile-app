@@ -120,6 +120,13 @@ class _AdminScreenState extends State<AdminScreen> {
                     color: Colors.teal,
                     onTap: () => context.go('/admin/products'),
                   ),
+                  _AdminCard(
+                    title: 'Apology Messages',
+                    subtitle: 'Review seller appeals',
+                    icon: Icons.support_agent,
+                    color: Colors.deepPurple,
+                    onTap: () => context.go('/admin/apology-messages'),
+                  ),
                   // _AdminCard(
                   //   title: 'Communication',
                   //   subtitle: 'Message users',

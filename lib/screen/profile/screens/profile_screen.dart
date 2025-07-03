@@ -427,6 +427,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: Colors.orange,
           onTap: () => context.go('/seller/orders'),
         ),
+
+        // Customer Service (for restricted sellers)
+        if (Provider.of<AuthStore>(context).currentUser?.isRestricted ==
+            true) ...[
+          const SizedBox(height: 12),
+          _ActionCard(
+            title: 'Customer Service',
+            subtitle: 'Send apology message to admin',
+            icon: Icons.support_agent,
+            color: Colors.red,
+            onTap: () => context.go('/seller/customer-service'),
+          ),
+        ],
         //  const SizedBox(height: 12),
 
         // Messages

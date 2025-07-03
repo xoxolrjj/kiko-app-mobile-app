@@ -59,6 +59,12 @@ service cloud.firestore {
       // TODO: Implement proper admin authentication with Firebase Auth
     }
     
+    // Apology messages collection
+    match /apology_messages/{apologyId} {
+      allow read, write, create: if true; // Temporarily allow all access for admin panel testing
+      // TODO: Implement proper admin authentication with Firebase Auth
+    }
+    
     // Helper functions
     function isAdmin() {
       return exists(/databases/$(database)/documents/admins/$(request.auth.uid));

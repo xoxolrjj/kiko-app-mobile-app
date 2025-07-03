@@ -77,92 +77,187 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
             ),
         ],
       ),
-      body: Observer(
-        builder: (_) {
-          if (_productStore.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        children: [
+          // Restriction Banner
+          Consumer<AuthStore>(
+            builder: (context, authStore, child) {
+              final isRestricted = authStore.currentUser?.isRestricted == true;
+              if (!isRestricted) return const SizedBox.shrink();
 
-          if (_productStore.errorMessage != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error, size: 64, color: Colors.red.shade300),
-                  const SizedBox(height: 16),
-                  Text(
-                    _productStore.errorMessage!,
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loadProductsBySeller,
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final products = _productStore.products;
-
-          if (products.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.inventory_2,
-                    size: 64,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No products yet',
-                    style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Add your first product to start selling',
-                    style: TextStyle(color: Colors.grey.shade500),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _showCreateProductDialog,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Product'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+              return Container(
+                width: double.infinity,
+                color: Colors.red.shade50,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.red, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Account Restricted: You can only edit/delete existing products',
+                        style: TextStyle(
+                          color: Colors.red.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }
+                    TextButton(
+                      onPressed: () => context.go('/seller/customer-service'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                      ),
+                      child: const Text(
+                        'Contact Support',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          // Main Content
+          Expanded(
+            child: Observer(
+              builder: (_) {
+                if (_productStore.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          return RefreshIndicator(
-            onRefresh: _loadProductsBySeller,
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return _ProductCard(
-                  product: product,
-                  onEdit: () => _showEditProductDialog(product),
-                  onDelete: () => _showDeleteConfirmation(product),
-                  onTap: () => _showProductDetails(product),
+                if (_productStore.errorMessage != null) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, size: 64, color: Colors.red.shade300),
+                        const SizedBox(height: 16),
+                        Text(
+                          _productStore.errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _loadProductsBySeller,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                final products = _productStore.products;
+
+                if (products.isEmpty) {
+                  final authStore = Provider.of<AuthStore>(
+                    context,
+                    listen: false,
+                  );
+                  final isRestricted =
+                      authStore.currentUser?.isRestricted == true;
+
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inventory_2,
+                          size: 64,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No products yet',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (isRestricted) ...[
+                          Text(
+                            'Your account is restricted from creating new products',
+                            style: TextStyle(color: Colors.red.shade600),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Contact customer service for account review',
+                            style: TextStyle(color: Colors.grey.shade500),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed:
+                                () => context.go('/seller/customer-service'),
+                            icon: const Icon(Icons.support_agent),
+                            label: const Text('Customer Service'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          Text(
+                            'Add your first product to start selling',
+                            style: TextStyle(color: Colors.grey.shade500),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: _showCreateProductDialog,
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Product'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: _loadProductsBySeller,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return _ProductCard(
+                        product: product,
+                        onEdit: () => _showEditProductDialog(product),
+                        onDelete: () => _showDeleteConfirmation(product),
+                        onTap: () => _showProductDetails(product),
+                      );
+                    },
+                  ),
                 );
               },
             ),
-          );
-        },
+          ),
+        ],
       ),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: _showCreateProductDialog,
@@ -173,7 +268,73 @@ class _SellerProductsScreenState extends State<SellerProductsScreen> {
   }
 
   void _showCreateProductDialog() {
+    final authStore = Provider.of<AuthStore>(context, listen: false);
+    final currentUser = authStore.currentUser;
+
+    // Check if seller is restricted
+    if (currentUser?.isRestricted == true) {
+      _showRestrictionDialog();
+      return;
+    }
+
     context.go('/create-product');
+  }
+
+  void _showRestrictionDialog() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Row(
+              children: [
+                Icon(Icons.warning, color: Colors.red),
+                const SizedBox(width: 8),
+                const Text('Account Restricted'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Your seller account has been restricted from creating new products.',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'You can still:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text('• Edit your existing products'),
+                const Text('• Delete your existing products'),
+                const Text('• View your order requests'),
+                const SizedBox(height: 12),
+                const Text(
+                  'To request account review, please use the Customer Service option in your profile.',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.go('/seller/customer-service');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Customer Service'),
+              ),
+            ],
+          ),
+    );
   }
 
   void _showEditProductDialog(ProductModel product) {

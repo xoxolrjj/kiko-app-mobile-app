@@ -6,6 +6,8 @@ import 'package:kiko_app_mobile_app/router.dart';
 import 'package:mobx/mobx.dart';
 import '../models/user_model.dart';
 import '../models/admin_model.dart';
+import '../models/notification_model.dart';
+import 'notification_store.dart';
 
 part 'auth_store.g.dart';
 
@@ -222,6 +224,9 @@ abstract class _AuthStore with Store {
       currentUser = newAccount;
       await fetchUsers(); // Refresh users list
 
+      // Send COD notification to new user
+      await _sendCODNotification(newAccount.id);
+
       return newAccount;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -248,6 +253,21 @@ abstract class _AuthStore with Store {
       return null;
     } finally {
       isLoading = false;
+    }
+  }
+
+  Future<void> _sendCODNotification(String userId) async {
+    try {
+      final notificationStore = NotificationStore();
+      await notificationStore.createNotification(
+        userId: userId,
+        title: 'Welcome to Kiko App!',
+        message:
+            'Important: All orders are processed with Cash on Delivery (COD) payment method only. Payment is made when you receive your order.',
+        type: NotificationType.accountCreated,
+      );
+    } catch (e) {
+      debugPrint('Error sending COD notification: $e');
     }
   }
 

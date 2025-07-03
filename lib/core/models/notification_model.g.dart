@@ -45,4 +45,6 @@ const _$NotificationTypeEnumMap = {
   NotificationType.accountRestricted: 'accountRestricted',
   NotificationType.newOrder: 'newOrder',
   NotificationType.orderCancelled: 'orderCancelled',
+  NotificationType.accountCreated: 'accountCreated',
+  NotificationType.sellerApology: 'sellerApology',
 };

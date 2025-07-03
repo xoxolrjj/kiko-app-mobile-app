@@ -23,6 +23,8 @@ import 'package:kiko_app_mobile_app/screen/admin/screens/seller_requests_screen.
 import 'package:kiko_app_mobile_app/screen/admin/screens/user_management_screen.dart';
 import 'package:kiko_app_mobile_app/screen/admin/screens/notifications_screen.dart';
 import 'package:kiko_app_mobile_app/screen/admin/screens/admin_communication_screen.dart';
+import 'package:kiko_app_mobile_app/screen/admin/screens/apology_management_screen.dart';
+import 'package:kiko_app_mobile_app/screen/seller/screens/seller_customer_service_screen.dart';
 import 'package:kiko_app_mobile_app/screen/checkout/screens/checkout_screen.dart';
 import 'package:kiko_app_mobile_app/screen/orders/screens/my_orders_screen.dart';
 import 'package:kiko_app_mobile_app/screen/messaging/screens/conversation_detail_screen.dart';
@@ -156,6 +158,10 @@ final goRouter = GoRouter(
       path: '/seller/orders',
       builder: (context, state) => const SellerOrdersScreen(),
     ),
+    GoRoute(
+      path: '/seller/customer-service',
+      builder: (context, state) => const SellerCustomerServiceScreen(),
+    ),
 
     // Checkout and Orders routes
     GoRoute(
@@ -226,6 +232,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/admin/communication',
       builder: (context, state) => const AdminCommunicationScreen(),
+    ),
+    GoRoute(
+      path: '/admin/apology-messages',
+      builder: (context, state) => const ApologyManagementScreen(),
     ),
 
     ShellRoute(

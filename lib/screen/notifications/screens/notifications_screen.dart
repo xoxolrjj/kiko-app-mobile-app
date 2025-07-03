@@ -141,6 +141,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           context.go('/seller/orders');
         }
         break;
+      case NotificationType.accountCreated:
+        // Keep user on notification screen for welcome message
+        break;
+      case NotificationType.sellerApology:
+        context.go('/admin/apology-messages');
+        break;
     }
   }
 }
@@ -235,6 +241,10 @@ class _NotificationCard extends StatelessWidget {
         return Icons.build;
       case NotificationType.orderReceived:
         return Icons.check_circle_outline;
+      case NotificationType.accountCreated:
+        return Icons.info;
+      case NotificationType.sellerApology:
+        return Icons.message;
     }
   }
 
@@ -260,6 +270,10 @@ class _NotificationCard extends StatelessWidget {
         return Colors.orange;
       case NotificationType.orderReceived:
         return Colors.teal;
+      case NotificationType.accountCreated:
+        return Colors.blue;
+      case NotificationType.sellerApology:
+        return Colors.deepPurple;
     }
   }
 
