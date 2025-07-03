@@ -18,6 +18,7 @@ enum NotificationType {
   orderCancelled,
   accountCreated,
   sellerApology,
+  adminReply,
 }
 
 @freezed
@@ -28,7 +29,10 @@ class NotificationModel with _$NotificationModel {
     required String title,
     required String message,
     required NotificationType type,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
     required DateTime createdAt,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+    required DateTime updatedAt,
     required bool isRead,
     String? orderId,
     String? sellerId,
@@ -40,6 +44,7 @@ class NotificationModel with _$NotificationModel {
   factory NotificationModel.fromSnapshot(DocumentSnapshot doc) {
     if (doc.data() == null) {
       return NotificationModel(
+        updatedAt: DateTime.now(),
         id: '',
         userId: '',
         title: '',
@@ -59,10 +64,22 @@ class NotificationModel with _$NotificationModel {
       type: NotificationType.values.firstWhere(
         (e) => e.toString() == 'NotificationType.${data['type']}',
       ),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: _dateTimeFromTimestamp(data['createdAt']),
+      updatedAt: _dateTimeFromTimestamp(data['updatedAt']),
       isRead: data['isRead'] as bool,
       orderId: data['orderId'] as String?,
       sellerId: data['sellerId'] as String?,
     );
   }
+}
+
+DateTime _dateTimeFromTimestamp(dynamic value) {
+  if (value == null) return DateTime.now();
+  if (value is Timestamp) return value.toDate();
+  if (value is String) return DateTime.parse(value);
+  return DateTime.now();
+}
+
+Timestamp _dateTimeToTimestamp(DateTime dateTime) {
+  return Timestamp.fromDate(dateTime);
 }

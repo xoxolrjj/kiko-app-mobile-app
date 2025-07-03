@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kiko_app_mobile_app/core/stores/auth_store.dart';
 import 'package:kiko_app_mobile_app/core/stores/seller_store.dart';
+import 'package:kiko_app_mobile_app/core/stores/admin_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -18,10 +19,22 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize seller count listener when screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+     WidgetsBinding.instance.addPostFrameCallback((_) {
       final sellerStore = Provider.of<SellerStore>(context, listen: false);
+    //  final adminStore = Provider.of<AdminStore>(context, listen: false);
+
       sellerStore.setupSellerCountListener();
+
+      //  adminStore
+      //     .ensureAdminUsersExist()
+      //     .then((_) {
+      //        adminStore.checkAdminNotificationSystem();
+      //     })
+      //     .catchError((error) {
+      //       debugPrint(
+      //         'Failed to initialize admin notification system: $error',
+      //       );
+      //     });
     });
   }
 
@@ -126,6 +139,13 @@ class _AdminScreenState extends State<AdminScreen> {
                     icon: Icons.support_agent,
                     color: Colors.deepPurple,
                     onTap: () => context.go('/admin/apology-messages'),
+                  ),
+                  _AdminCard(
+                    title: 'Notifications',
+                    subtitle: 'Order alerts & updates',
+                    icon: Icons.notifications,
+                    color: Colors.purple,
+                    onTap: () => context.go('/admin/notifications'),
                   ),
                   // _AdminCard(
                   //   title: 'Communication',

@@ -21,7 +21,6 @@ mixin _$UserModel {
   String get email => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get location => throw _privateConstructorUsedError;
-  String get password => throw _privateConstructorUsedError;
   String? get phoneNumber => throw _privateConstructorUsedError;
   String? get gender => throw _privateConstructorUsedError;
   int? get age => throw _privateConstructorUsedError;
@@ -48,7 +47,6 @@ abstract class $UserModelCopyWith<$Res> {
     String email,
     String name,
     String location,
-    String password,
     String? phoneNumber,
     String? gender,
     int? age,
@@ -79,7 +77,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? email = null,
     Object? name = null,
     Object? location = null,
-    Object? password = null,
     Object? phoneNumber = freezed,
     Object? gender = freezed,
     Object? age = freezed,
@@ -110,11 +107,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 null == location
                     ? _value.location
                     : location // ignore: cast_nullable_to_non_nullable
-                        as String,
-            password:
-                null == password
-                    ? _value.password
-                    : password // ignore: cast_nullable_to_non_nullable
                         as String,
             phoneNumber:
                 freezed == phoneNumber
@@ -176,7 +168,6 @@ abstract class _$$UserModelImplCopyWith<$Res>
     String email,
     String name,
     String location,
-    String password,
     String? phoneNumber,
     String? gender,
     int? age,
@@ -206,7 +197,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? email = null,
     Object? name = null,
     Object? location = null,
-    Object? password = null,
     Object? phoneNumber = freezed,
     Object? gender = freezed,
     Object? age = freezed,
@@ -237,11 +227,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
             null == location
                 ? _value.location
                 : location // ignore: cast_nullable_to_non_nullable
-                    as String,
-        password:
-            null == password
-                ? _value.password
-                : password // ignore: cast_nullable_to_non_nullable
                     as String,
         phoneNumber:
             freezed == phoneNumber
@@ -296,7 +281,6 @@ class _$UserModelImpl extends _UserModel {
     required this.email,
     required this.name,
     required this.location,
-    required this.password,
     this.phoneNumber,
     this.gender,
     this.age,
@@ -315,8 +299,6 @@ class _$UserModelImpl extends _UserModel {
   final String name;
   @override
   final String location;
-  @override
-  final String password;
   @override
   final String? phoneNumber;
   @override
@@ -337,7 +319,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, name: $name, location: $location, password: $password, phoneNumber: $phoneNumber, gender: $gender, age: $age, photoUrl: $photoUrl, role: $role, isVerified: $isVerified, isRestricted: $isRestricted, createdAt: $createdAt)';
+    return 'UserModel(id: $id, email: $email, name: $name, location: $location, phoneNumber: $phoneNumber, gender: $gender, age: $age, photoUrl: $photoUrl, role: $role, isVerified: $isVerified, isRestricted: $isRestricted, createdAt: $createdAt)';
   }
 
   @override
@@ -350,8 +332,6 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.location, location) ||
                 other.location == location) &&
-            (identical(other.password, password) ||
-                other.password == password) &&
             (identical(other.phoneNumber, phoneNumber) ||
                 other.phoneNumber == phoneNumber) &&
             (identical(other.gender, gender) || other.gender == gender) &&
@@ -374,7 +354,6 @@ class _$UserModelImpl extends _UserModel {
     email,
     name,
     location,
-    password,
     phoneNumber,
     gender,
     age,
@@ -400,7 +379,6 @@ abstract class _UserModel extends UserModel {
     required final String email,
     required final String name,
     required final String location,
-    required final String password,
     final String? phoneNumber,
     final String? gender,
     final int? age,
@@ -420,8 +398,6 @@ abstract class _UserModel extends UserModel {
   String get name;
   @override
   String get location;
-  @override
-  String get password;
   @override
   String? get phoneNumber;
   @override

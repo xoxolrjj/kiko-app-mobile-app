@@ -133,6 +133,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           context.go('/my-orders');
         }
         break;
+      case NotificationType.adminReply:
+        // Navigate to customer service where sellers can see admin replies
+        context.go('/seller/customer-service');
+        break;
       case NotificationType.accountRestricted:
         context.go('/profile');
         break;
@@ -245,6 +249,8 @@ class _NotificationCard extends StatelessWidget {
         return Icons.info;
       case NotificationType.sellerApology:
         return Icons.message;
+      case NotificationType.adminReply:
+        return Icons.message;
     }
   }
 
@@ -273,6 +279,8 @@ class _NotificationCard extends StatelessWidget {
       case NotificationType.accountCreated:
         return Colors.blue;
       case NotificationType.sellerApology:
+        return Colors.deepPurple;
+      case NotificationType.adminReply:
         return Colors.deepPurple;
     }
   }

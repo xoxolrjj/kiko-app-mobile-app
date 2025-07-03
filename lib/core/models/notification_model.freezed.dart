@@ -26,7 +26,10 @@ mixin _$NotificationModel {
   String get title => throw _privateConstructorUsedError;
   String get message => throw _privateConstructorUsedError;
   NotificationType get type => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+  DateTime get updatedAt => throw _privateConstructorUsedError;
   bool get isRead => throw _privateConstructorUsedError;
   String? get orderId => throw _privateConstructorUsedError;
   String? get sellerId => throw _privateConstructorUsedError;
@@ -54,7 +57,10 @@ abstract class $NotificationModelCopyWith<$Res> {
     String title,
     String message,
     NotificationType type,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
     DateTime createdAt,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+    DateTime updatedAt,
     bool isRead,
     String? orderId,
     String? sellerId,
@@ -82,6 +88,7 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
     Object? message = null,
     Object? type = null,
     Object? createdAt = null,
+    Object? updatedAt = null,
     Object? isRead = null,
     Object? orderId = freezed,
     Object? sellerId = freezed,
@@ -117,6 +124,11 @@ class _$NotificationModelCopyWithImpl<$Res, $Val extends NotificationModel>
                 null == createdAt
                     ? _value.createdAt
                     : createdAt // ignore: cast_nullable_to_non_nullable
+                        as DateTime,
+            updatedAt:
+                null == updatedAt
+                    ? _value.updatedAt
+                    : updatedAt // ignore: cast_nullable_to_non_nullable
                         as DateTime,
             isRead:
                 null == isRead
@@ -154,7 +166,10 @@ abstract class _$$NotificationModelImplCopyWith<$Res>
     String title,
     String message,
     NotificationType type,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
     DateTime createdAt,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+    DateTime updatedAt,
     bool isRead,
     String? orderId,
     String? sellerId,
@@ -181,6 +196,7 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
     Object? message = null,
     Object? type = null,
     Object? createdAt = null,
+    Object? updatedAt = null,
     Object? isRead = null,
     Object? orderId = freezed,
     Object? sellerId = freezed,
@@ -217,6 +233,11 @@ class __$$NotificationModelImplCopyWithImpl<$Res>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                     as DateTime,
+        updatedAt:
+            null == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                    as DateTime,
         isRead:
             null == isRead
                 ? _value.isRead
@@ -246,7 +267,10 @@ class _$NotificationModelImpl implements _NotificationModel {
     required this.title,
     required this.message,
     required this.type,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
     required this.createdAt,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+    required this.updatedAt,
     required this.isRead,
     this.orderId,
     this.sellerId,
@@ -266,7 +290,11 @@ class _$NotificationModelImpl implements _NotificationModel {
   @override
   final NotificationType type;
   @override
+  @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
   final DateTime createdAt;
+  @override
+  @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+  final DateTime updatedAt;
   @override
   final bool isRead;
   @override
@@ -276,7 +304,7 @@ class _$NotificationModelImpl implements _NotificationModel {
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, userId: $userId, title: $title, message: $message, type: $type, createdAt: $createdAt, isRead: $isRead, orderId: $orderId, sellerId: $sellerId)';
+    return 'NotificationModel(id: $id, userId: $userId, title: $title, message: $message, type: $type, createdAt: $createdAt, updatedAt: $updatedAt, isRead: $isRead, orderId: $orderId, sellerId: $sellerId)';
   }
 
   @override
@@ -291,6 +319,8 @@ class _$NotificationModelImpl implements _NotificationModel {
             (identical(other.type, type) || other.type == type) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
             (identical(other.isRead, isRead) || other.isRead == isRead) &&
             (identical(other.orderId, orderId) || other.orderId == orderId) &&
             (identical(other.sellerId, sellerId) ||
@@ -307,6 +337,7 @@ class _$NotificationModelImpl implements _NotificationModel {
     message,
     type,
     createdAt,
+    updatedAt,
     isRead,
     orderId,
     sellerId,
@@ -336,7 +367,10 @@ abstract class _NotificationModel implements NotificationModel {
     required final String title,
     required final String message,
     required final NotificationType type,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
     required final DateTime createdAt,
+    @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+    required final DateTime updatedAt,
     required final bool isRead,
     final String? orderId,
     final String? sellerId,
@@ -356,7 +390,11 @@ abstract class _NotificationModel implements NotificationModel {
   @override
   NotificationType get type;
   @override
+  @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
   DateTime get createdAt;
+  @override
+  @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _dateTimeToTimestamp)
+  DateTime get updatedAt;
   @override
   bool get isRead;
   @override

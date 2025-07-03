@@ -6,6 +6,7 @@ import 'package:kiko_app_mobile_app/firebase_options.dart';
 import 'package:kiko_app_mobile_app/router.dart';
 import 'package:kiko_app_mobile_app/core/stores/product_store.dart';
 import 'package:kiko_app_mobile_app/core/stores/seller_store.dart';
+import 'package:kiko_app_mobile_app/core/stores/admin_store.dart';
 import 'package:provider/provider.dart';
 import 'dependency/dependency_manager.dart';
 
@@ -28,6 +29,7 @@ void main() async {
         authStore: authStore,
         productStore: sl<ProductStore>(),
         sellerStore: sl<SellerStore>(),
+        adminStore: sl<AdminStore>(),
       ),
     );
   } catch (e) {
@@ -39,12 +41,14 @@ class MyApp extends StatelessWidget {
   final AuthStore authStore;
   final ProductStore productStore;
   final SellerStore sellerStore;
+  final AdminStore adminStore;
 
   const MyApp({
     super.key,
     required this.authStore,
     required this.productStore,
     required this.sellerStore,
+    required this.adminStore,
   });
 
   @override
@@ -55,6 +59,7 @@ class MyApp extends StatelessWidget {
         Provider<ProductStore>.value(value: productStore),
         //      Provider<NotificationStore>.value(value: notificationStore),
         Provider<SellerStore>.value(value: sellerStore),
+        Provider<AdminStore>.value(value: adminStore),
       ],
       child: MaterialApp.router(
         routerConfig: goRouter,

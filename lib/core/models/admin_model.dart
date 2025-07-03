@@ -5,7 +5,6 @@ class AdminModel {
   final String id;
   final String email;
   final String name;
-  final String password;
   final String? phoneNumber;
   final String? photoUrl;
   final DateTime createdAt;
@@ -17,7 +16,6 @@ class AdminModel {
     required this.id,
     required this.email,
     required this.name,
-    required this.password,
     this.phoneNumber,
     this.photoUrl,
     required this.createdAt,
@@ -31,7 +29,6 @@ class AdminModel {
       id: '',
       email: '',
       name: '',
-      password: '',
       phoneNumber: null,
       photoUrl: null,
       createdAt: DateTime.now(),
@@ -50,7 +47,6 @@ class AdminModel {
 
     return AdminModel(
       id: doc.id,
-      password: cast<String>(json['password']) ?? '',
       email: cast<String>(json['email']) ?? '',
       name: cast<String>(json['name']) ?? '',
       phoneNumber: cast<String>(json['phoneNumber']),
@@ -67,7 +63,6 @@ class AdminModel {
   factory AdminModel.fromJson(Map<String, dynamic> json) {
     return AdminModel(
       id: cast<String>(json['id']) ?? '',
-      password: cast<String>(json['password']) ?? '',
       email: cast<String>(json['email']) ?? '',
       name: cast<String>(json['name']) ?? '',
       phoneNumber: cast<String>(json['phoneNumber']),
@@ -84,7 +79,6 @@ class AdminModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'password': password,
       'email': email,
       'name': name,
       'phoneNumber': phoneNumber,
@@ -100,7 +94,6 @@ class AdminModel {
     String? id,
     String? email,
     String? name,
-    String? password,
     String? phoneNumber,
     String? photoUrl,
     DateTime? createdAt,
@@ -112,7 +105,6 @@ class AdminModel {
       id: id ?? this.id,
       email: email ?? this.email,
       name: name ?? this.name,
-      password: password ?? this.password,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
       createdAt: createdAt ?? this.createdAt,

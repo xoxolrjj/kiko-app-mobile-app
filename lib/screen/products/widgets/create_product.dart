@@ -85,13 +85,13 @@ class _CreateProductState extends State<CreateProduct> {
         throw Exception('User not logged in');
       }
 
-      // Check if seller is restricted
-      if (user.isRestricted) {
+      // Check if seller is restricted (only for creating new products)
+      if (user.isRestricted && !isEditing) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'Your account has been restricted from uploading products. Please contact support.',
+                'Your account has been restricted from creating new products. Please contact support.',
               ),
               backgroundColor: Colors.red,
             ),

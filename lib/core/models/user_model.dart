@@ -13,7 +13,6 @@ class UserModel with _$UserModel {
     required String email,
     required String name,
     required String location,
-    required String password,
     String? phoneNumber,
     String? gender,
     int? age,
@@ -39,7 +38,6 @@ class UserModel with _$UserModel {
       role: UserRole.user,
       isVerified: false,
       isRestricted: false,
-      password: '',
       createdAt: DateTime.now(),
     );
   }
@@ -53,7 +51,6 @@ class UserModel with _$UserModel {
 
     return UserModel(
       id: doc.id,
-      password: cast<String>(json['password']) ?? '',
       email: cast<String>(json['email']) ?? '',
       name: cast<String>(json['name']) ?? '',
       location: cast<String>(json['location']) ?? '',
@@ -73,7 +70,6 @@ class UserModel with _$UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      password: cast<String>(json['password']) ?? '',
       id: cast<String>(json['id']) ?? '',
       email: cast<String>(json['email']) ?? '',
       name: cast<String>(json['name']) ?? '',
@@ -95,7 +91,6 @@ class UserModel with _$UserModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'password': password,
       'email': email,
       'name': name,
       'location': location,

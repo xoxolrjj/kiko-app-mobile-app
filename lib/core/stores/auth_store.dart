@@ -205,7 +205,6 @@ abstract class _AuthStore with Store {
         id: userCredential.user!.uid,
         email: email,
         name: name,
-        password: password,
         phoneNumber: phoneNumber,
         gender: gender ?? '',
         age: age ?? 0,
@@ -643,72 +642,38 @@ abstract class _AuthStore with Store {
       isLoading = true;
       errorMessage = null;
 
-      // First, check if this is a valid admin in the admins collection
+      // First, authenticate with Firebase Auth
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      if (userCredential.user == null) {
+        return false;
+      }
+
+      // Then check if this authenticated user is an admin
       final adminQuery =
           await _firestore
               .collection('admins')
               .where('email', isEqualTo: email)
-              .where('password', isEqualTo: password)
               .where('isActive', isEqualTo: true)
               .get();
 
-      if (adminQuery.docs.isEmpty) {
-        return false; // Not a valid admin
+      if (adminQuery.docs.isNotEmpty) {
+        // User is authenticated AND is an admin
+        final adminDoc = adminQuery.docs.first;
+        currentAdmin = AdminModel.fromSnapshot(adminDoc);
+        currentUser = null; // Clear user state when admin logs in
+        AuthRefreshNotifier().refresh();
+        return true;
+      } else {
+        // User is authenticated but not an admin
+        await _auth.signOut(); // Sign out since they're not an admin
+        return false;
       }
-
-      // Admin credentials are valid, now authenticate with Firebase Auth
-      try {
-        // Try to sign in with Firebase Auth
-        final userCredential = await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-
-        if (userCredential.user != null) {
-          // Successfully authenticated with Firebase Auth
-          final adminDoc = adminQuery.docs.first;
-          currentAdmin = AdminModel.fromSnapshot(adminDoc);
-          currentUser = null; // Clear user state when admin logs in
-          AuthRefreshNotifier().refresh();
-          return true;
-        }
-      } catch (firebaseAuthError) {
-        // If Firebase Auth fails, it might be because the admin account doesn't exist in Firebase Auth
-        // In this case, we'll create a Firebase Auth account for the admin
-        debugPrint(
-          'Admin not found in Firebase Auth, creating account: $firebaseAuthError',
-        );
-
-        try {
-          final userCredential = await _auth.createUserWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
-
-          if (userCredential.user != null) {
-            // Successfully created and authenticated
-            final adminDoc = adminQuery.docs.first;
-            currentAdmin = AdminModel.fromSnapshot(adminDoc);
-            currentUser = null; // Clear user state when admin logs in
-            AuthRefreshNotifier().refresh();
-            return true;
-          }
-        } catch (createError) {
-          debugPrint(
-            'Failed to create Firebase Auth account for admin: $createError',
-          );
-          // Fall back to the old method if Firebase Auth creation fails
-          final adminDoc = adminQuery.docs.first;
-          currentAdmin = AdminModel.fromSnapshot(adminDoc);
-          currentUser = null; // Clear user state when admin logs in
-          AuthRefreshNotifier().refresh();
-          return true;
-        }
-      }
-
-      return false; // Should not reach here
     } catch (e) {
-      errorMessage = 'Admin login failed: $e';
+      errorMessage = 'Admin login failed: Invalid credentials';
       debugPrint('Error in admin login: $e');
       return false;
     } finally {

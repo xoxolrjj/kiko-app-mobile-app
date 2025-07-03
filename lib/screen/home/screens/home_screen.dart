@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         elevation: 0,
         title: Text(
-          'Welcome ${authStore.currentUser?.name}',
+          'Welcome ${authStore.currentUser?.name.split(' ').first}',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).primaryColor,

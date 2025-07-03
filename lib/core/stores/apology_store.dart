@@ -129,6 +129,25 @@ abstract class _ApologyStore with Store {
       isLoading = true;
       errorMessage = null;
 
+      // Get the original apology message to find the seller
+      final apologyDoc =
+          await _firestore.collection('apology_messages').doc(apologyId).get();
+
+      if (!apologyDoc.exists) {
+        throw Exception('Apology message not found');
+      }
+
+      final apologyData = apologyDoc.data() as Map<String, dynamic>;
+      final sellerId = apologyData['sellerId'] as String;
+      final sellerName = apologyData['sellerName'] as String;
+
+      debugPrint(
+        '🔍 Admin responding to apology from seller: $sellerName (ID: $sellerId)',
+      );
+      debugPrint('📝 Admin response: $adminResponse');
+      debugPrint('👤 Reviewed by: $reviewedBy');
+
+      // Update the apology message with admin response
       await _firestore.collection('apology_messages').doc(apologyId).update({
         'adminResponse': adminResponse,
         'reviewedBy': reviewedBy,
@@ -136,6 +155,33 @@ abstract class _ApologyStore with Store {
         'status': status.name,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      debugPrint('✅ Apology message updated successfully');
+
+      // Send notification to seller about admin reply
+      debugPrint('📧 Attempting to send notification to seller...');
+      try {
+        await _notificationStore.createNotification(
+          userId: sellerId,
+          title: 'Admin Reply Received',
+          message:
+              'Admin has responded to your apology message: "${adminResponse.length > 100 ? adminResponse.substring(0, 100) + '...' : adminResponse}"',
+          type: NotificationType.adminReply,
+          sellerId: sellerId,
+        );
+        debugPrint(
+          '✅ Notification sent successfully to seller $sellerName (ID: $sellerId)',
+        );
+      } catch (notificationError) {
+        debugPrint(
+          '❌ Failed to send notification to seller: $notificationError',
+        );
+        // Don't fail the entire operation if notification fails
+      }
+
+      debugPrint(
+        '📧 Notification sent to seller $sellerName about admin reply',
+      );
 
       await loadApologyMessages();
 

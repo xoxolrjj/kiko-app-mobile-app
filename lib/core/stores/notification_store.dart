@@ -12,18 +12,44 @@ class NotificationStore {
     String? orderId,
     String? sellerId,
   }) async {
-    final notificationRef = _firestore.collection('notifications').doc();
-    await notificationRef.set({
-      'id': notificationRef.id,
-      'userId': userId,
-      'title': title,
-      'message': message,
-      'type': type.toString().split('.').last,
-      'createdAt': FieldValue.serverTimestamp(),
-      'isRead': false,
-      'orderId': orderId,
-      'sellerId': sellerId,
-    });
+    try {
+      final notificationRef = _firestore.collection('notifications').doc();
+
+      // Add debug logging for admin reply notifications
+      if (type == NotificationType.adminReply) {
+        print('🔔 Creating admin reply notification for seller: $userId');
+        print('📧 Title: $title');
+        print('💬 Message: $message');
+      }
+
+      await notificationRef.set({
+        'id': notificationRef.id,
+        'userId': userId,
+        'title': title,
+        'message': message,
+        'type': type.toString().split('.').last,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'orderId': orderId,
+        'sellerId': sellerId,
+      });
+
+      // Success logging for admin reply notifications
+      if (type == NotificationType.adminReply) {
+        print(
+          '✅ Admin reply notification created successfully for seller: $userId',
+        );
+      }
+    } catch (e) {
+      print('❌ Error creating notification for user $userId: $e');
+      if (type == NotificationType.adminReply) {
+        print(
+          '❌ Failed to create admin reply notification for seller: $userId',
+        );
+      }
+      rethrow;
+    }
   }
 
   Stream<List<NotificationModel>> getNotifications(String userId) {
